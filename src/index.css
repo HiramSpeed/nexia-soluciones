@@ -1,0 +1,49 @@
+:root {
+  --primary-color: #00A3FF;
+  /* Tech Blue */
+  --primary-hover: #0081CC;
+  --text-color: #FFFFFF;
+  --secondary-text-color: #E2E8F0;
+  --background-color: #1a202c;
+  /* Dark Blue/Grey */
+  --card-background: #2d3748;
+  --font-main: 'Lato', sans-serif;
+  --font-heading: 'Jura', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: var(--font-heading);
+}
