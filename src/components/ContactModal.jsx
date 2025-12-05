@@ -23,24 +23,20 @@ const ContactModal = ({ isOpen, onClose, source = 'General' }) => {
         setIsSubmitting(true);
 
         try {
-            // Using EmailJS for email sending
-            const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            // Usando Formspree - Más fácil de configurar que EmailJS
+            const response = await fetch('https://formspree.io/f/mldqlnzy', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    service_id: 'YOUR_SERVICE_ID', // User needs to configure
-                    template_id: 'YOUR_TEMPLATE_ID', // User needs to configure
-                    user_id: 'YOUR_PUBLIC_KEY', // User needs to configure
-                    template_params: {
-                        to_email: 'info@nexiasoluciones.com.mx,ventas@nexiasoluciones.com.mx',
-                        from_name: formData.nombre,
-                        from_email: formData.email,
-                        phone: formData.celular,
-                        message: formData.mensaje,
-                        source: formData.origen
-                    }
+                    nombre: formData.nombre,
+                    email: formData.email,
+                    celular: formData.celular,
+                    mensaje: formData.mensaje,
+                    origen: formData.origen,
+                    _replyto: formData.email,
+                    _subject: `Nuevo Lead desde NexIA Soluciones - ${formData.origen}`,
                 })
             });
 
@@ -55,7 +51,7 @@ const ContactModal = ({ isOpen, onClose, source = 'General' }) => {
                 setSubmitStatus('error');
             }
         } catch (error) {
-            console.error('Error sending email:', error);
+            console.error('Error sending form:', error);
             setSubmitStatus('error');
         } finally {
             setIsSubmitting(false);
