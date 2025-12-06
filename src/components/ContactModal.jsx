@@ -24,7 +24,7 @@ const ContactModal = ({ isOpen, onClose, source = 'General' }) => {
 
         try {
             // Usando Formspree con el endpoint proporcionado por el usuario
-            const response = await fetch('https://formspree.io/f/mgvgzyzk', {
+            const response = await fetch('https://formspree.io/f/xnnezlry', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

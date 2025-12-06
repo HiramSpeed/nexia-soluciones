@@ -21,7 +21,7 @@ const Footer = ({ openPrivacy }) => {
         setStatus(null);
 
         try {
-            const response = await fetch('https://formspree.io/f/mgvgzyzk', {
+            const response = await fetch('https://formspree.io/f/xnnezlry', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
