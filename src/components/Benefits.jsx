@@ -73,13 +73,14 @@ const Benefits = () => {
     ];
 
     return (
-        <section id="benefits" style={sectionStyle}>
-            <h2 style={titleStyle}>Transformamos Datos en Crecimiento Neto.</h2>
-            <div style={gridStyle}>
+        <section id="benefits" className="benefits-section" style={{ backgroundColor: 'var(--background-color)' }}>
+            <h2 className="section-title">Transformamos Datos en Crecimiento Neto.</h2>
+            <div className="benefits-grid">
                 {benefits.map((item, index) => (
                     <div
                         key={index}
                         style={cardStyle}
+                        className="benefits-card"
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-10px)';
                             e.currentTarget.style.borderColor = 'var(--primary-color)';

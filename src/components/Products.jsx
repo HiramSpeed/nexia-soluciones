@@ -66,11 +66,11 @@ const Products = ({ openModal }) => {
     };
 
     return (
-        <section id="products" style={sectionStyle}>
-            <h2 style={titleStyle}>Software que Trabaja 24/7 para tu Rentabilidad.</h2>
+        <section id="products" className="products-section" style={{ backgroundColor: '#232936' }}>
+            <h2 className="section-title">Software que Trabaja 24/7 para tu Rentabilidad.</h2>
 
-            <div style={gridStyle}>
-                <div style={productCardStyle}>
+            <div className="products-grid">
+                <div style={productCardStyle} className="product-card">
                     <img src={nexguardMockup} alt="NexGuard App Mockup" style={{ width: '100%', height: '300px', objectFit: 'cover' }} />
                     <div style={contentStyle}>
                         <h3 style={productNameStyle}>NexGuard</h3>
@@ -83,7 +83,7 @@ const Products = ({ openModal }) => {
                     </div>
                 </div>
 
-                <div style={productCardStyle}>
+                <div style={productCardStyle} className="product-card">
                     <img src={nexadminMockup} alt="NexAdmin App Mockup" style={{ width: '100%', height: '300px', objectFit: 'cover' }} />
                     <div style={contentStyle}>
                         <h3 style={productNameStyle}>NexAdmin</h3>

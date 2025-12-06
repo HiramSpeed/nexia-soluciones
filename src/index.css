@@ -17,11 +17,19 @@
   padding: 0;
 }
 
+html,
+body {
+  overflow-x: hidden;
+  /* Crítico para evitar scroll horizontal indeseado en móvil */
+  width: 100%;
+}
+
 body {
   font-family: var(--font-main);
   background-color: var(--background-color);
   color: var(--text-color);
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
 h1,
@@ -46,4 +54,308 @@ button {
   cursor: pointer;
   border: none;
   font-family: var(--font-heading);
+}
+
+/* Resets Multimedia */
+img,
+video,
+svg,
+canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Utilidades Responsivas */
+.mobile-only {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: block !important;
+  }
+
+  /* Ajustes globales de tipografía para móvil */
+  html {
+    font-size: 16px;
+  }
+}
+
+/* =========================================
+   HERO SECTION
+   ========================================= */
+.hero-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 120px 20px 60px;
+  background: radial-gradient(circle at 50% 50%, #2d3748 0%, #1a202c 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-logo {
+  width: 320px;
+  height: auto;
+  margin-bottom: 50px;
+  filter: drop-shadow(0 0 30px rgba(0, 163, 255, 0.5));
+  animation: float 6s ease-in-out infinite;
+}
+
+.hero-title {
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  max-width: 900px;
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.hero-highlight {
+  color: var(--primary-color);
+  text-shadow: 0 0 20px rgba(0, 163, 255, 0.5);
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--secondary-text-color);
+  margin-bottom: 40px;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+.hero-bg-element {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(0, 163, 255, 0.1) 0%, rgba(26, 32, 44, 0) 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* MOBILE STYLES FOR HERO */
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 100px 20px 40px;
+    /* Reducir padding superior e inferior */
+    min-height: auto;
+    /* Permitir que el contenido defina el alto si es necesario */
+  }
+
+  .hero-logo {
+    width: 200px;
+    /* Reducir logo significativamente */
+    margin-bottom: 30px;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+    /* Reducir titulos para evitar desbordes */
+    word-wrap: break-word;
+    /* Asegurar quiebre de palabras largas */
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+
+  .hero-bg-element {
+    width: 100%;
+    /* Evitar que el background fuerce ancho */
+    height: 100%;
+  }
+}
+
+/* =========================================
+   HEADER & NAVIGATION
+   ========================================= */
+.header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 15px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: transparent;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.header-container.scrolled {
+  background-color: rgba(26, 32, 44, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header-logo {
+  height: 65px;
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+.nav-desktop {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.nav-link {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--secondary-text-color);
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.nav-link:hover {
+  color: var(--primary-color);
+}
+
+.mobile-menu-btn {
+  display: none;
+  /* Oculto en desktop */
+  font-size: 2rem;
+  background: none;
+  color: var(--text-color);
+  z-index: 1001;
+  /* Encima del overlay */
+}
+
+.nav-mobile {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(26, 32, 44, 0.98);
+  backdrop-filter: blur(15px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: right 0.3s ease-in-out;
+  z-index: 999;
+}
+
+.nav-mobile.open {
+  right: 0;
+}
+
+.nav-mobile-links {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  text-align: center;
+  width: 80%;
+}
+
+.nav-link-mobile {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.nav-link-mobile:hover {
+  color: var(--primary-color);
+}
+
+/* MOBILE STYLES FOR HEADER */
+@media (max-width: 768px) {
+  .nav-desktop {
+    display: none;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+  }
+
+  .header-logo {
+    height: 50px;
+    /* Reducir logo en header móvil */
+  }
+
+  .header-container {
+    padding: 10px 5%;
+  }
+}
+
+/* =========================================
+   GRID SYSTEMS (BENEFITS & PRODUCTS)
+   ========================================= */
+.benefits-section,
+.products-section {
+  padding: 100px 5%;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 60px;
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 40px;
+  max-width: 1000px;
+  margin: 0 auto 60px;
+}
+
+/* MOBILE ADJUSTMENTS FOR GRIDS */
+@media (max-width: 768px) {
+
+  .benefits-section,
+  .products-section {
+    padding: 60px 4%;
+    /* Reducir padding de sección */
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+    /* Reducir tamaño título sección */
+    margin-bottom: 40px;
+    word-wrap: break-word;
+  }
+
+  .benefits-grid,
+  .products-grid {
+    grid-template-columns: 1fr;
+    /* Stacking: forzar 1 columna */
+    gap: 30px;
+  }
+
+  /* Ajustes adicionales para que tarjetas no sean muy anchas en landscape pero llenen portrait */
+  .benefits-card,
+  .product-card {
+    width: 100%;
+    margin: 0 auto;
+  }
 }

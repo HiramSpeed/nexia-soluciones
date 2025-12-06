@@ -4,6 +4,7 @@ import logo from '../assets/logo.png';
 
 const Header = ({ openModal }) => {
     const [scrolled, setScrolled] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -13,53 +14,44 @@ const Header = ({ openModal }) => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const headerStyle = {
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        padding: '15px 5%',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: scrolled ? 'rgba(26, 32, 44, 0.95)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(10px)' : 'none',
-        boxShadow: scrolled ? '0 2px 10px rgba(0,0,0,0.3)' : 'none',
-        zIndex: 1000,
-        transition: 'all 0.3s ease',
-        borderBottom: scrolled ? '1px solid rgba(255,255,255,0.05)' : 'none',
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
     };
 
-    const logoStyle = {
-        height: '65px',
-        width: 'auto',
-        transition: 'transform 0.3s ease',
-    };
-
-    const navStyle = {
-        display: 'flex',
-        gap: '30px',
-        alignItems: 'center',
-    };
-
-    const linkStyle = {
-        fontWeight: '500',
-        fontSize: '0.95rem',
-        color: 'var(--secondary-text-color)',
-        transition: 'color 0.2s',
-        cursor: 'pointer',
+    const closeMenu = () => {
+        setIsMenuOpen(false);
     };
 
     return (
-        <header style={headerStyle}>
-            <img src={logo} alt="NexIA Soluciones" style={logoStyle} />
-            <nav style={navStyle}>
-                <a href="#benefits" style={linkStyle} onMouseEnter={(e) => e.target.style.color = 'var(--primary-color)'} onMouseLeave={(e) => e.target.style.color = 'var(--secondary-text-color)'}>Beneficios</a>
-                <a href="#products" style={linkStyle} onMouseEnter={(e) => e.target.style.color = 'var(--primary-color)'} onMouseLeave={(e) => e.target.style.color = 'var(--secondary-text-color)'}>Productos</a>
-                <a href="#consulting" style={linkStyle} onMouseEnter={(e) => e.target.style.color = 'var(--primary-color)'} onMouseLeave={(e) => e.target.style.color = 'var(--secondary-text-color)'}>Consultoría</a>
-                <a href="#academy" style={linkStyle} onMouseEnter={(e) => e.target.style.color = 'var(--primary-color)'} onMouseLeave={(e) => e.target.style.color = 'var(--secondary-text-color)'}>Academia</a>
+        <header className={`header-container ${scrolled ? 'scrolled' : ''}`}>
+            <img src={logo} alt="NexIA Soluciones" className="header-logo" />
+
+            {/* Desktop Navigation */}
+            <nav className="nav-desktop">
+                <a href="#benefits" className="nav-link">Beneficios</a>
+                <a href="#products" className="nav-link">Productos</a>
+                <a href="#consulting" className="nav-link">Consultoría</a>
+                <a href="#academy" className="nav-link">Academia</a>
                 <Button variant="primary" onClick={() => openModal('Auditoría Gratuita - Header')}>Auditoría Gratuita</Button>
             </nav>
+
+            {/* Mobile Menu Button */}
+            <button className="mobile-menu-btn" onClick={toggleMenu} aria-label="Menu">
+                {isMenuOpen ? '✕' : '☰'}
+            </button>
+
+            {/* Mobile Navigation Overlay */}
+            <div className={`nav-mobile ${isMenuOpen ? 'open' : ''}`}>
+                <nav className="nav-mobile-links">
+                    <a href="#benefits" className="nav-link-mobile" onClick={closeMenu}>Beneficios</a>
+                    <a href="#products" className="nav-link-mobile" onClick={closeMenu}>Productos</a>
+                    <a href="#consulting" className="nav-link-mobile" onClick={closeMenu}>Consultoría</a>
+                    <a href="#academy" className="nav-link-mobile" onClick={closeMenu}>Academia</a>
+                    <Button variant="primary" onClick={() => { openModal('Auditoría Gratuita - Mobile'); closeMenu(); }} style={{ marginTop: '20px', width: '100%' }}>
+                        Auditoría Gratuita
+                    </Button>
+                </nav>
+            </div>
         </header>
     );
 };

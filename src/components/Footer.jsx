@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from './Button';
 
-const Footer = () => {
+const Footer = ({ openPrivacy }) => {
     const footerStyle = {
         backgroundColor: '#111319', // Very dark footer
         color: '#FFFFFF',
@@ -95,6 +95,23 @@ const Footer = () => {
                     <a href="#products" style={linkStyle} onMouseEnter={(e) => e.target.style.color = 'var(--primary-color)'} onMouseLeave={(e) => e.target.style.color = 'var(--secondary-text-color)'}>Productos</a>
                     <a href="#consulting" style={linkStyle} onMouseEnter={(e) => e.target.style.color = 'var(--primary-color)'} onMouseLeave={(e) => e.target.style.color = 'var(--secondary-text-color)'}>Consultoría</a>
                     <a href="#academy" style={linkStyle} onMouseEnter={(e) => e.target.style.color = 'var(--primary-color)'} onMouseLeave={(e) => e.target.style.color = 'var(--secondary-text-color)'}>Academia</a>
+                    <button
+                        onClick={openPrivacy}
+                        style={{
+                            ...linkStyle,
+                            background: 'none',
+                            border: 'none',
+                            padding: 0,
+                            fontFamily: 'inherit',
+                            fontSize: 'inherit',
+                            textAlign: 'left',
+                            cursor: 'pointer'
+                        }}
+                        onMouseEnter={(e) => e.target.style.color = 'var(--primary-color)'}
+                        onMouseLeave={(e) => e.target.style.color = 'var(--secondary-text-color)'}
+                    >
+                        Aviso de Privacidad
+                    </button>
                 </div>
 
                 <div style={columnStyle}>

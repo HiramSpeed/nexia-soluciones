@@ -8,10 +8,12 @@ import Academy from './components/Academy';
 // import Testimonials from './components/Testimonials'; // TEMPORALMENTE DESHABILITADO - Pendiente de autorización de clientes
 import Footer from './components/Footer';
 import ContactModal from './components/ContactModal';
+import PrivacyPolicyModal from './components/PrivacyPolicyModal';
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalSource, setModalSource] = useState('General');
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   const openModal = (source) => {
     setModalSource(source);
@@ -20,6 +22,14 @@ function App() {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const openPrivacy = () => {
+    setIsPrivacyOpen(true);
+  };
+
+  const closePrivacy = () => {
+    setIsPrivacyOpen(false);
   };
 
   return (
@@ -33,8 +43,9 @@ function App() {
       {/* SECCIÓN TEMPORALMENTE DESHABILITADA */}
       {/* TODO: Habilitar cuando se obtenga autorización de los clientes para usar sus testimonios */}
       {/* <Testimonials /> */}
-      <Footer />
+      <Footer openPrivacy={openPrivacy} />
       <ContactModal isOpen={isModalOpen} onClose={closeModal} source={modalSource} />
+      <PrivacyPolicyModal isOpen={isPrivacyOpen} onClose={closePrivacy} />
     </div>
   );
 }
