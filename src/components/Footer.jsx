@@ -1,7 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from './Button';
 
 const Footer = ({ openPrivacy }) => {
+    const [formData, setFormData] = useState({
+        nombre: '',
+        email: '',
+        celular: '',
+        mensaje: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [status, setStatus] = useState(null);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setStatus(null);
+
+        try {
+            const response = await fetch('https://formspree.io/f/mgvgzyzk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nombre: formData.nombre,
+                    email: formData.email,
+                    celular: formData.celular,
+                    mensaje: formData.mensaje,
+                    _replyto: formData.email,
+                    _subject: 'Nuevo Contacto desde Footer - NexIA Soluciones',
+                    _cc: 'dhiramnavarro@gmail.com'
+                })
+            });
+
+            if (response.ok) {
+                setStatus('success');
+                setFormData({ nombre: '', email: '', celular: '', mensaje: '' });
+                setTimeout(() => setStatus(null), 3000);
+            } else {
+                setStatus('error');
+            }
+        } catch (error) {
+            setStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
     const footerStyle = {
         backgroundColor: '#111319', // Very dark footer
         color: '#FFFFFF',
@@ -116,36 +162,57 @@ const Footer = ({ openPrivacy }) => {
 
                 <div style={columnStyle}>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: '700' }}>Contáctanos</h3>
-                    <form style={formStyle} onSubmit={(e) => e.preventDefault()}>
+                    <form style={formStyle} onSubmit={handleSubmit}>
                         <input
                             type="text"
+                            name="nombre"
                             placeholder="Nombre"
                             style={inputStyle}
+                            value={formData.nombre}
+                            onChange={handleChange}
+                            required
                             onFocus={(e) => e.target.style.borderColor = 'var(--primary-color)'}
                             onBlur={(e) => e.target.style.borderColor = '#333'}
                         />
                         <input
                             type="email"
+                            name="email"
                             placeholder="Correo Electrónico"
                             style={inputStyle}
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
                             onFocus={(e) => e.target.style.borderColor = 'var(--primary-color)'}
                             onBlur={(e) => e.target.style.borderColor = '#333'}
                         />
                         <input
                             type="tel"
+                            name="celular"
                             placeholder="Celular"
                             style={inputStyle}
+                            value={formData.celular}
+                            onChange={handleChange}
+                            required
                             onFocus={(e) => e.target.style.borderColor = 'var(--primary-color)'}
                             onBlur={(e) => e.target.style.borderColor = '#333'}
                         />
                         <textarea
+                            name="mensaje"
                             placeholder="Mensaje"
                             rows="3"
                             style={inputStyle}
+                            value={formData.mensaje}
+                            onChange={handleChange}
                             onFocus={(e) => e.target.style.borderColor = 'var(--primary-color)'}
                             onBlur={(e) => e.target.style.borderColor = '#333'}
                         ></textarea>
-                        <Button variant="primary" style={{ width: '100%' }}>Enviar Mensaje</Button>
+
+                        {status === 'success' && <p style={{ color: '#48BB78', fontSize: '0.9rem' }}>¡Enviado con éxito!</p>}
+                        {status === 'error' && <p style={{ color: '#F56565', fontSize: '0.9rem' }}>Error al enviar.</p>}
+
+                        <Button variant="primary" style={{ width: '100%' }} disabled={isSubmitting}>
+                            {isSubmitting ? 'Enviando...' : 'Enviar Mensaje'}
+                        </Button>
                     </form>
                 </div>
             </div>
