@@ -23,8 +23,8 @@ const ContactModal = ({ isOpen, onClose, source = 'General' }) => {
         setIsSubmitting(true);
 
         try {
-            // Usando Formspree con el endpoint proporcionado por el usuario
-            const response = await fetch('https://formspree.io/f/xnnezlry', {
+            // Usando Formspree con el endpoint verificado (info@nexiasoluciones.com.mx)
+            const response = await fetch('https://formspree.io/f/mldqlnzy', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -35,9 +35,7 @@ const ContactModal = ({ isOpen, onClose, source = 'General' }) => {
                     celular: formData.celular,
                     mensaje: formData.mensaje,
                     origen: formData.origen,
-                    _replyto: formData.email,
                     _subject: `Nuevo Lead desde NexIA Soluciones - ${formData.origen}`,
-                    _cc: 'dhiramnavarro@gmail.com', // Copia al correo personal
                 })
             });
 

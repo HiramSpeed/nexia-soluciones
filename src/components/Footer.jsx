@@ -21,7 +21,8 @@ const Footer = ({ openPrivacy }) => {
         setStatus(null);
 
         try {
-            const response = await fetch('https://formspree.io/f/xnnezlry', {
+            // Endpoint verificado info@nexiasoluciones.com.mx
+            const response = await fetch('https://formspree.io/f/mldqlnzy', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -29,9 +30,7 @@ const Footer = ({ openPrivacy }) => {
                     email: formData.email,
                     celular: formData.celular,
                     mensaje: formData.mensaje,
-                    _replyto: formData.email,
                     _subject: 'Nuevo Contacto desde Footer - NexIA Soluciones',
-                    _cc: 'dhiramnavarro@gmail.com'
                 })
             });
 
