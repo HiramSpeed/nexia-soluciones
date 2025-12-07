@@ -59,17 +59,49 @@ const FileViewerModal = ({ isOpen, onClose, fileUrl, fileType, title }) => {
         <div style={modalOverlayStyle} onClick={onClose}>
             <div style={modalContentStyle} onClick={(e) => e.stopPropagation()}>
                 <div style={headerStyle}>
-                    <h3 style={{ margin: 0, color: '#FFFFFF', fontSize: '1.2rem' }}>{title}</h3>
-                    <button style={closeButtonStyle} onClick={onClose}>×</button>
+                    <h3 style={{
+                        margin: 0,
+                        color: '#FFFFFF',
+                        fontSize: '1.2rem',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: '70%'
+                    }}>{title}</h3>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                        <a
+                            href={fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                            style={{
+                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                color: '#FFF',
+                                textDecoration: 'none',
+                                padding: '8px 12px',
+                                borderRadius: '6px',
+                                fontSize: '0.9rem',
+                                border: '1px solid rgba(255, 255, 255, 0.2)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '5px'
+                            }}
+                        >
+                            <span>Descargar</span>
+                        </a>
+                        <button style={closeButtonStyle} onClick={onClose}>×</button>
+                    </div>
                 </div>
 
                 <div style={contentContainerStyle}>
                     {fileType === 'pdf' ? (
-                        <iframe
-                            src={fileUrl}
-                            style={{ width: '100%', height: '100%', border: 'none', backgroundColor: '#FFFFFF' }}
-                            title="PDF Viewer"
-                        />
+                        <div style={{ width: '100%', height: '100%', overflow: 'hidden', borderRadius: '4px', backgroundColor: '#FFF' }}>
+                            <iframe
+                                src={fileUrl}
+                                style={{ width: '100%', height: '100%', border: 'none' }}
+                                title="PDF Viewer"
+                            />
+                        </div>
                     ) : (
                         <img
                             src={fileUrl}
