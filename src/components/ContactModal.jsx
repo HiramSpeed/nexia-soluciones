@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ContactModal = ({ isOpen, onClose, source = 'General' }) => {
+const ContactModal = ({ isOpen, onClose, source = 'General', onSuccess }) => {
     const [formData, setFormData] = useState({
         nombre: '',
         email: '',
@@ -45,6 +45,7 @@ const ContactModal = ({ isOpen, onClose, source = 'General' }) => {
                     onClose();
                     setFormData({ nombre: '', email: '', celular: '', mensaje: '', origen: source });
                     setSubmitStatus(null);
+                    if (onSuccess) onSuccess();
                 }, 2000);
             } else {
                 setSubmitStatus('error');
