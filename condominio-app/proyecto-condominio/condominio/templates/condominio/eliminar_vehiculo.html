@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmar Eliminación</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .confirm-container { background-color: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 400px; text-align: center; }
+        .btn-confirmar { background-color: #dc3545; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%;}
+        .btn-cancelar { display: block; text-align: center; background-color: #6c757d; color: white; padding: 12px; margin-top: 10px; border-radius: 4px; text-decoration: none; font-size: 16px; }
+        .form-container { 
+            background-color: white; 
+            padding: 40px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            width: auto; /* El ancho se adapta al contenedor */
+            margin: auto;
+            max-width: 450px; /* Mantenemos el ancho del formulario */
+        }
+    </style>
+</head>
+<body>
+    {% include 'condominio/_header_villa.html' %}
+    <div class="confirm-container">
+        <h2>¿Estás seguro?</h2>
+        <p>Estás a punto de eliminar permanentemente el vehículo con placas:</p>
+        <p><strong>{{ vehiculo.placa }} ({{ vehiculo.marca }} {{ vehiculo.modelo }})</strong></p>
+        <p>Esta acción no se puede deshacer.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-confirmar">Sí, eliminar</button>
+            <a href="{% url 'dashboard' %}" class="btn-cancelar">Cancelar</a>
+        </form>
+    </div>
+</body>
+</html>

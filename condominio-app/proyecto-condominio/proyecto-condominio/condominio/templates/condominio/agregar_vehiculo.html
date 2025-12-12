@@ -1,0 +1,96 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Añadir Vehículo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Django's default errorlist is a <ul> with this class */
+        .errorlist { list-style-type: none; padding-left: 0; color: #b91c1c; }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-4 md:p-8">
+
+    <div class="w-full max-w-4xl mx-auto">
+        {% include 'condominio/_header_villa.html' %}
+
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-lg mt-6 w-full max-w-md mx-auto">
+            <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">Registrar Nuevo Vehículo</h2>
+
+            {% if form.errors %}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4" role="alert">
+                    <strong class="font-bold">¡Por favor, corrige los siguientes errores!</strong>
+
+                    <div class="mt-2">
+                        {{ form.non_field_errors }}
+                        {{ form.placa.errors }}
+                        {{ form.marca.errors }}
+                        {{ form.modelo.errors }}
+                        {{ form.color.errors }}
+                    </div>
+                </div>
+            {% endif %}
+
+            <form method="post" id="vehiculoForm" class="space-y-6">
+                {% csrf_token %}
+
+                <div>
+                    {{ form.placa.label_tag }}
+                    {{ form.placa|add_class:"mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" }}
+                </div>
+
+                <div>
+                    {{ form.marca.label_tag }}
+                    {{ form.marca|add_class:"mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" }}
+                </div>
+
+                <div>
+                    {{ form.modelo.label_tag }}
+                    {{ form.modelo|add_class:"mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" }}
+                </div>
+
+                <div>
+                    {{ form.color.label_tag }}
+                    {{ form.color|add_class:"mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500" }}
+                </div>
+
+                <button type="submit" class="w-full py-3 px-4 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors">
+                    Enviar a Revisión
+                </button>
+
+                <a href="{% url 'condominio:dashboard' %}" class="block w-full text-center py-3 px-4 rounded-xl bg-gray-500 text-white font-semibold hover:bg-gray-600 transition-colors no-underline">
+                    Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const marcaSelect = document.getElementById('id_marca');
+        const modeloSelect = document.getElementById('id_modelo');
+
+        marcaSelect.addEventListener('change', function() {
+            const marcaId = this.value;
+            modeloSelect.innerHTML = '<option value="">--- Selecciona un Modelo ---</option>';
+
+            if (marcaId) {
+                const url = `{% url 'condominio:ajax_load_modelos' %}?marca_id=${marcaId}`;
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(modelo => {
+                            const option = document.createElement('option');
+                            option.value = modelo.id;
+                            option.textContent = modelo.nombre;
+                            modeloSelect.appendChild(option);
+                        });
+                    });
+            }
+        });
+    </script>
+</body>
+</html>

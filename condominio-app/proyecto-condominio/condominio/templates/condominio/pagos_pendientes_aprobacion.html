@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprobación de Pagos - Administrador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .container-box {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn-link {
+            display: inline-block;
+            background-color: #3b82f6; /* Tailwind blue-500 */
+            color: white;
+            padding: 8px 16px;
+            border-radius: 9999px; /* Tailwind rounded-full */
+            text-decoration: none;
+        }
+        .btn-link:hover {
+            background-color: #2563eb; /* Tailwind blue-600 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-6 md:p-12">
+
+    <div class="max-w-4xl mx-auto container-box bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Pagos Pendientes de Aprobación</h1>
+
+        {% if messages %}
+            <ul class="mb-4">
+            {% for message in messages %}
+                <li class="p-3 mb-2 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}">
+                    {{ message }}
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if pagos %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                <thead class="bg-blue-600 text-white">
+                    <tr>
+                        <th class="py-2 px-4 text-left">Residente</th>
+                        <th class="py-2 px-4 text-left">Concepto</th>
+                        <th class="py-2 px-4 text-left">Monto</th>
+                        <th class="py-2 px-4 text-left">Fecha de Subida</th>
+                        <th class="py-2 px-4 text-center">Comprobante</th>
+                        <th class="py-2 px-4 text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pago in pagos %}
+                    <tr class="border-t border-gray-200">
+                        <td class="py-3 px-4">{{ pago.casa.residente.username }}</td>
+                        <td class="py-3 px-4">{{ pago.concepto }}</td>
+                        <td class="py-3 px-4">${{ pago.monto_a_pagar }}</td>
+                        <td class="py-3 px-4">{{ pago.fecha_pago|date:"d M, Y" }}</td>
+                        <td class="py-3 px-4 text-center">
+                            {% if pago.comprobante %}
+                                <a href="{{ pago.comprobante.url }}" target="_blank" class="text-blue-500 hover:text-blue-700 underline">Ver Comprobante</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4 text-center">
+                            <form action="{% url 'aprobar_pago' pago.id %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600 transition duration-300">
+                                    Aprobar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center text-gray-500 mt-10">🎉 No hay pagos pendientes de aprobación en este momento.</p>
+        {% endif %}
+
+        <div class="mt-8 text-center">
+            <a href="{% url 'dashboard' %}" class="bg-gray-500 text-white px-6 py-2 rounded-xl hover:bg-gray-600 transition duration-300">
+                Volver al Dashboard
+            </a>
+        </div>
+    </div>
+</body>
+</html>

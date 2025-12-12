@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Visita Registrada</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'form_mobile.css' %}">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container-confirmacion {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 450px;
+            width: 100%;
+        }
+        .container-confirmacion h2 {
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        .container-confirmacion p {
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .url-box {
+            background-color: #f8f9fa;
+            border: 1px dashed #ced4da;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            word-wrap: break-word; /* Para que el texto largo se ajuste */
+            margin-bottom: 20px;
+        }
+        .btn-accion {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+        .btn-copiar {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-whatsapp {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-volver {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-confirmacion">
+        <h2>🎉 ¡Visita Registrada con Éxito!</h2>
+        <p>
+            Hemos generado el enlace de acceso para <strong>{{ visitante.nombre_visitante }}</strong>.
+            Puedes compartir este enlace con tu visita para que complete su registro.
+        </p>
+
+        <div class="url-box">
+            <span id="access-link">{{ url_acceso }}</span>
+        </div>
+
+        <button id="copy-btn" class="btn-accion btn-copiar">Copiar Enlace</button>
+        <a href="{{ whatsapp_url }}" class="btn-accion btn-whatsapp" target="_blank">
+            <i class="fab fa-whatsapp"></i> Compartir por WhatsApp
+        </a>
+        <a href="{% url 'condominio:dashboard' %}" class="btn-accion btn-volver">Volver al Panel</a>
+    </div>
+
+    <script>
+        document.getElementById('copy-btn').addEventListener('click', function() {
+            const linkElement = document.getElementById('access-link');
+            const linkText = linkElement.textContent;
+
+            navigator.clipboard.writeText(linkText).then(function() {
+                alert('Enlace copiado al portapapeles.');
+            }, function() {
+                alert('No se pudo copiar el enlace.');
+            });
+        });
+    </script>
+</body>
+</html>

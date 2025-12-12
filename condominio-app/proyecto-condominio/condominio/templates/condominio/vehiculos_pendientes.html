@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehículos Pendientes - Administrador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 p-6 md:p-12">
+
+    <div class="max-w-4xl mx-auto container-box bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Vehículos Pendientes de Aprobación</h1>
+
+        {% if messages %}
+            <ul class="mb-4">
+            {% for message in messages %}
+                <li class="p-3 mb-2 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% endif %}">
+                    {{ message }}
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if vehiculos %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                <thead class="bg-blue-600 text-white">
+                    <tr>
+                        <th class="py-2 px-4 text-left">Residente</th>
+                        <th class="py-2 px-4 text-left">Casa</th> <th class="py-2 px-4 text-left">Placa</th>
+                        <th class="py-2 px-4 text-left">Marca y Modelo</th>
+                        <th class="py-2 px-4 text-left">Color</th>
+                        <th class="py-2 px-4 text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vehiculo in vehiculos %}
+                    <tr class="border-t border-gray-200">
+                        <td class="py-3 px-4">{{ vehiculo.casa.residente.username }}</td>
+                        <td class="py-3 px-4">{{ vehiculo.casa.numero_casa }}</td> <td class="py-3 px-4">{{ vehiculo.placa }}</td>
+                        <td class="py-3 px-4">{{ vehiculo.marca }} {{ vehiculo.modelo }}</td>
+                        <td class="py-3 px-4">{{ vehiculo.color }}</td>
+                        <td class="py-3 px-4 text-center">
+                            <a href="{% url 'condominio:autorizar_vehiculo' vehiculo.id %}" class="bg-green-500 text-white px-4 py-2 rounded-xl hover:bg-green-600 transition duration-300">
+                                Autorizar
+                            </a>
+                            </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center text-gray-500 mt-10">🎉 No hay vehículos pendientes de aprobación en este momento.</p>
+        {% endif %}
+
+        <div class="mt-8 text-center">
+            <a href="{% url 'condominio:dashboard' %}" class="bg-gray-500 text-white px-6 py-2 rounded-xl hover:bg-gray-600 transition duration-300">
+                Volver al Dashboard
+            </a>
+        </div>
+    </div>
+</body>
+</html>

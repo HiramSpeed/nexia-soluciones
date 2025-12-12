@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrega de Gafetes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos para la transición suave de color y el modal */
+        .casa-card {
+            transition: background-color 0.3s ease-in-out, opacity 0.5s ease;
+        }
+        .modal-backdrop {
+            transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <div class="container mx-auto p-6">
+
+        <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+            <h1 class="text-3xl font-bold text-gray-800">Dashboard de Entrega de Gafetes</h1>
+
+            {% if user.is_superuser %}
+            <form action="{% url 'condominio:resetear_gafetes' %}" method="POST"
+                  onsubmit="return confirm('¿Estás MUY seguro de que quieres resetear TODOS los estados de gafetes a \'Pendiente\'? Esta acción no se puede deshacer.');">
+                {% csrf_token %}
+                <button type="submit" class="px-4 py-2 bg-yellow-500 text-white font-bold rounded-lg shadow hover:bg-yellow-600 transition-colors">
+                    Resetear Todos a Pendiente
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="flex flex-wrap gap-6 mb-8">
+            <div class="flex items-center gap-2">
+                <div class="w-5 h-5 rounded-full bg-orange-400"></div>
+                <div>
+                    <span class="font-medium">Pendiente</span>
+                    <p class="text-sm text-gray-500 font-bold">({{ pendientes_count }} Casas)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-5 h-5 rounded-full bg-red-500"></div>
+                <div>
+                    <span class="font-medium">En Revisión</span>
+                    <p class="text-sm text-gray-500 font-bold">({{ en_revision_count }} Casas)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-5 h-5 rounded-full bg-green-500"></div>
+                <div>
+                    <span class="font-medium">Entregado</span>
+                    <p class="text-sm text-gray-500 font-bold">({{ entregados_count }} Casas)</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="casas-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-4">
+            {% for casa in casas %}
+                <div
+                    class="casa-card text-white font-bold text-lg rounded-lg shadow-md flex flex-col items-center justify-center p-4 h-24 cursor-pointer
+                    {% if casa.estado_gafete == 'Pendiente' %} bg-orange-400 hover:bg-orange-500
+                    {% elif casa.estado_gafete == 'Entregado' %} bg-green-500 hover:bg-green-600
+                    {% else %} bg-red-500 hover:bg-red-600 {% endif %}"
+                    data-casa-id="{{ casa.id }}"
+                    data-casa-numero="{{ casa.numero_casa }}"
+                    data-vehiculos-count="{{ casa.vehiculos_aprobados_count }}">
+                    <span>Casa</span>
+                    <span>{{ casa.numero_casa }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="confirm-modal" class="modal-backdrop fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden opacity-0">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <h2 class="text-2xl font-bold mb-4">Casa <span id="modal-casa-numero" class="text-blue-600"></span></h2>
+
+            <p class="text-gray-700 mb-6 text-lg">Esta casa tiene
+                <strong id="modal-vehiculos-count" class="text-4xl font-extrabold text-gray-800 mx-2"></strong>
+                vehículo(s) registrado(s) y aprobado(s).
+            </p>
+
+            <p class="text-gray-600 mb-6">Por favor, confirma la acción para la entrega de gafetes:</p>
+            <div class="flex justify-end gap-4">
+                <button id="modal-btn-cancelar" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400">Cancelar</button>
+                <button id="modal-btn-revision" data-nuevo-estado="En Revision" class="modal-btn-accion px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">Error / En Revisión</button>
+                <button id="modal-btn-entregado" data-nuevo-estado="Entregado" class="modal-btn-accion px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Gafetes Entregados</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const casasGrid = document.getElementById('casas-grid');
+            const modal = document.getElementById('confirm-modal');
+            const modalCasaNumero = document.getElementById('modal-casa-numero');
+            const modalVehiculosCount = document.getElementById('modal-vehiculos-count');
+            const btnCancelar = document.getElementById('modal-btn-cancelar');
+            let currentCasaId = null;
+
+            const showModal = (casaCard) => {
+                currentCasaId = casaCard.dataset.casaId;
+                modalCasaNumero.textContent = casaCard.dataset.casaNumero;
+                modalVehiculosCount.textContent = casaCard.dataset.vehiculosCount;
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.add('opacity-100'), 10);
+            };
+
+            const hideModal = () => {
+                modal.classList.remove('opacity-100');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+                currentCasaId = null;
+            };
+
+            casasGrid.addEventListener('click', (e) => {
+                const casaCard = e.target.closest('.casa-card');
+                if (casaCard) { showModal(casaCard); }
+            });
+
+            btnCancelar.addEventListener('click', hideModal);
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) { hideModal(); }
+            });
+
+            const actualizarEstado = async (casaId, estado) => {
+                const url = `/vigilancia/casa/${casaId}/actualizar-gafete/`;
+                const csrfToken = '{{ csrf_token }}';
+                const formData = new FormData();
+                formData.append('estado', estado);
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': csrfToken },
+                        body: formData,
+                    });
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        const casaCard = document.querySelector(`.casa-card[data-casa-id='${casaId}']`);
+                        casaCard.classList.remove('bg-orange-400', 'hover:bg-orange-500', 'bg-red-500', 'hover:bg-red-600', 'bg-green-500', 'hover:bg-green-600');
+                        if (estado === 'Entregado') {
+                            casaCard.classList.add('bg-green-500', 'hover:bg-green-600');
+                        } else {
+                            casaCard.classList.add('bg-red-500', 'hover:bg-red-600');
+                        }
+                        hideModal();
+
+                        // Recargar la página para actualizar los contadores
+                        // Opcional: podrías actualizar los contadores con JS, pero recargar es más simple
+                        window.location.reload();
+
+                    } else {
+                        alert(`Error: ${data.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error en la petición fetch:', error);
+                    alert('Hubo un error de conexión. Inténtalo de nuevo.');
+                }
+            };
+
+            modal.addEventListener('click', (e) => {
+                const actionButton = e.target.closest('.modal-btn-accion');
+                if (actionButton && currentCasaId) {
+                    const nuevoEstado = actionButton.dataset.nuevoEstado;
+                    actualizarEstado(currentCasaId, nuevoEstado);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

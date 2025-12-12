@@ -1,0 +1,66 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Acceso</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="w-full max-w-4xl mx-auto p-4 md:p-8">
+        {% include 'condominio/_header_villa.html' %}
+
+        <div class="bg-white w-full max-w-lg mx-auto p-6 md:p-10 rounded-xl shadow-lg mt-8">
+
+            <div class="text-center">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Registro de Acceso</h2>
+                <p class="text-gray-600 mt-2">para {{ villa_actual.nombre }}</p>
+            </div>
+
+            <div class="text-sm text-gray-700 my-6 space-y-2">
+                <p>Hola, <strong class="font-semibold">{{ visitante.nombre_visitante }}</strong>.</p>
+                <p>Estás registrando tu visita para la casa de <strong class="font-semibold">{{ visitante.casa.propietario }}</strong> (Casa {{ visitante.casa.numero_casa }}).</p>
+                <p class="mt-4 font-semibold text-gray-800">Por favor, sube los siguientes documentos para agilizar tu entrada.</p>
+            </div>
+
+            <hr class="my-6">
+
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            {{ field.label }}
+                        </label>
+                        {{ field|add_class:"mt-1 block w-full text-sm text-gray-600 border-gray-300 rounded-md shadow-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+                        {% if field.help_text %}
+                            <p class="mt-2 text-xs text-gray-500">{{ field.help_text|safe }}</p>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p class="mt-2 text-xs text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="w-full py-3 px-4 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors">
+                    Enviar Documentos
+                </button>
+            </form>
+        </div>
+
+        <footer class="text-center mt-8 text-sm text-gray-600">
+            <p>Este proyecto es patrocinado como proyecto comunitario por parte de <strong>lvb.org</strong></p>
+            <a href="#" class="inline-block mt-4 px-6 py-2 rounded-full bg-green-500 text-white font-semibold hover:bg-green-600 transition-colors no-underline" target="_blank" rel="noopener noreferrer">
+                Hacer una Donación
+            </a>
+        </footer>
+    </div>
+</body>
+</html>

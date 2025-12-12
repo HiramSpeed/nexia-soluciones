@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Casas con Adeudo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 p-6 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-wrap justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Casas con Adeudo</h1>
+            <a href="{% url 'condominio:dashboard' %}" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                &larr; Volver al Panel Principal
+            </a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-3 font-semibold">Casa</th>
+                            <th class="p-3 font-semibold">Propietario</th>
+                            <th class="p-3 font-semibold">Teléfono</th>
+                            <th class="p-3 font-semibold text-right">Saldo Deudor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for casa in casas_con_adeudo %}
+                        <tr class="border-t hover:bg-gray-50">
+                            <td class="p-3 font-medium">{{ casa.numero_casa }}</td>
+                            <td class="p-3">{{ casa.propietario }}</td>
+                            <td class="p-3 text-gray-600">{{ casa.telefono|default:"N/A" }}</td>
+                            <td class="p-3 font-bold text-red-600 text-right">${{ casa.saldo }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="p-4 text-center text-gray-500">
+                                ¡Felicidades! No hay ninguna casa con adeudo.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

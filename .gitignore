@@ -27,3 +27,18 @@ dist-ssr
 .env
 .env.local
 .env.production
+
+# Python
+venv/
+env/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+db.sqlite3
+*.sqlite3
+media/
+staticfiles/
+*.zip
+*.rar
+*.7z

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuestas de la Comunidad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="w-full max-w-4xl mx-auto p-4 md:p-8">
+        {% include 'condominio/_header_villa.html' %}
+
+        <div class="flex flex-col sm:flex-row items-center justify-between my-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Propuestas</h1>
+            <a href="{% url 'condominio:propuesta_crear' %}" class="w-full sm:w-auto text-center px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors no-underline">
+                + Crear Nueva Propuesta
+            </a>
+        </div>
+
+        <div class="space-y-6">
+            {% for propuesta in propuestas %}
+                <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">
+
+                    <div class="flex flex-col sm:flex-row justify-between sm:items-start mb-2">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 sm:mb-0">
+                            {{ propuesta.titulo }}
+                        </h3>
+
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full
+                            {% if propuesta.estado == 'activa' %} bg-green-100 text-green-800
+                            {% elif propuesta.estado == 'aprobada' %} bg-blue-100 text-blue-800
+                            {% elif propuesta.estado == 'rechazada' %} bg-red-100 text-red-800
+                            {% elif propuesta.estado == 'cancelada' %} bg-gray-100 text-gray-800
+                            {% endif %}">
+                            {{ propuesta.get_estado_display }}
+                        </span>
+                    </div>
+
+                    <p class="text-sm text-gray-500 mb-4">
+                        <strong>Propuesto por:</strong> Casa {{ propuesta.autor.numero_casa }}
+                    </p>
+
+                    <p class="text-gray-700 mb-4">
+                        {{ propuesta.descripcion|truncatewords:30 }}
+                    </p>
+
+                    <a href="{% url 'condominio:propuesta_detalle' propuesta.id %}" class="font-semibold text-blue-600 hover:underline">
+                        Ver Detalles y Votar &rarr;
+                    </a>
+                </div>
+            {% empty %}
+                <div class="bg-white text-center p-10 rounded-xl shadow-md">
+                    <p class="text-gray-600">No hay propuestas activas o pasadas en este momento.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <a href="{% url 'condominio:dashboard' %}" class="inline-block mt-8 font-semibold text-gray-600 hover:text-gray-900 no-underline">
+            &larr; Volver al Panel Principal
+        </a>
+    </div>
+
+</body>
+</html>

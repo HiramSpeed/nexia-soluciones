@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Casas del Condominio</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        h1 { color: #333; }
+        ul { list-style-type: none; padding: 0; }
+        li { background-color: #f4f4f4; border: 1px solid #ddd; margin-bottom: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    {% include 'condominio/_header_villa.html' %}
+    <h1>Casas Registradas en el Condominio</h1>
+
+    {% if casas %}
+        <ul>
+            {% for casa in casas %}
+                <li>
+                    <strong>Casa N°:</strong> {{ casa.numero_casa }} <br>
+                    <strong>Propietario:</strong> {{ casa.propietario }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aún no hay casas registradas.</p>
+    {% endif %}
+</body>
+</html>

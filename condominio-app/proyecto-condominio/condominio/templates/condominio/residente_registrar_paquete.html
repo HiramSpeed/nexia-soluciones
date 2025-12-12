@@ -1,0 +1,46 @@
+{% extends 'condominio/base.html' %}
+
+{% block title %}Pre-registrar Paquete{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background-color: white;
+        padding: 40px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        max-width: 600px;
+        margin: 20px auto;
+    }
+    .form-container h2 { text-align: center; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
+    .btn-submit { width:100%; padding:12px; background-color:#007bff; color:white; border:none; border-radius:5px; font-size: 16px; cursor: pointer; }
+    .btn-cancelar { display:block; text-align:center; margin-top:10px; text-decoration: none; color: #6c757d; font-weight: bold; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Pre-registrar Paquete con Código</h2>
+    <p style="text-align: center; color: #6c757d; margin-top: -15px; margin-bottom: 25px;">
+        Usa este formulario si esperas una entrega que requiere un código para que el guardia la reciba.
+    </p>
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            {{ form.remitente.label_tag }}
+            {{ form.remitente }}
+        </div>
+        <div class="form-group">
+            {{ form.codigo_recogida.label_tag }}
+            {{ form.codigo_recogida }}
+        </div>
+
+        <button type="submit" class="btn-submit">Registrar Paquete</button>
+        <a href="{%   url 'condominio:dashboard' %}" class="btn-cancelar">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

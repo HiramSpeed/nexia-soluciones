@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+{% load static %}
+{% load custom_filters %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Visita</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos personalizados para el formulario. Se minimiza el uso de CSS manual. */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-4 md:p-8">
+
+    {% if messages %}
+    <div class="fixed top-4 left-4 right-4 z-50">
+        {% for message in messages %}
+        <div class="max-w-xl mx-auto p-4 mb-2 rounded-lg text-white text-center font-bold shadow-lg
+                    {% if message.tags == 'success' %}bg-green-500{% elif message.tags == 'warning' %}bg-yellow-500{% else %}bg-red-500{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="w-full max-w-4xl mx-auto">
+        {% include 'condominio/_header_villa.html' %}
+
+        <div class="bg-white p-6 md:p-10 rounded-xl shadow-lg mt-6 w-full max-w-md mx-auto">
+            <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">Registrar Nueva Visita</h2>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="hidden">{{ form.fecha_programada }}</div>
+
+                <div>
+                    <label for="{{ form.nombre_visitante.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ form.nombre_visitante.label }}
+                    </label>
+                    {{ form.nombre_visitante|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" }}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Fecha y Hora Programada
+                    </label>
+                    <div class="flex space-x-2">
+                        <select id="select_dia" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                        <select id="select_mes" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                        <select id="select_hora" class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-2 p-4 bg-gray-50 rounded-lg">
+                    {{ form.requiere_estacionamiento }}
+                    <label for="{{ form.requiere_estacionamiento.id_for_label }}" class="text-sm text-gray-700">
+                        {{ form.requiere_estacionamiento.label }}
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full py-3 px-4 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors">
+                    Generar Enlace para Visitante
+                </button>
+                <a href="{% url 'condominio:dashboard' %}" class="block w-full text-center py-3 px-4 rounded-xl bg-gray-500 text-white font-semibold hover:bg-gray-600 transition-colors no-underline">
+                    Cancelar
+                </a>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    // ... (Tu código JavaScript actual, no es necesario cambiarlo) ...
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Referencias a nuestros elementos ---
+        const diaSelect = document.getElementById('select_dia');
+        const mesSelect = document.getElementById('select_mes');
+        const horaSelect = document.getElementById('select_hora');
+        const djangoDateField = document.getElementById('id_fecha_programada');
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const ahora = new Date();
+
+        function poblarDias(mes, ano) {
+            diaSelect.innerHTML = '';
+            const diasEnMes = new Date(ano, mes + 1, 0).getDate();
+            for (let i = 1; i <= diasEnMes; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                diaSelect.appendChild(option);
+            }
+        }
+
+        meses.forEach((nombreMes, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = nombreMes;
+            mesSelect.appendChild(option);
+        });
+
+        for (let i = 0; i < 24; i++) {
+            const hora = `${String(i).padStart(2, '0')}:00`;
+            const option = document.createElement('option');
+            option.value = hora;
+            option.textContent = hora;
+            horaSelect.appendChild(option);
+        }
+
+        poblarDias(ahora.getMonth(), ahora.getFullYear());
+        diaSelect.value = ahora.getDate();
+        mesSelect.value = ahora.getMonth();
+        horaSelect.value = `${String(ahora.getHours()).padStart(2, '0')}:00`;
+
+        function actualizarCampoDjango() {
+            const dia = String(diaSelect.value).padStart(2, '0');
+            const mes = String(parseInt(mesSelect.value) + 1).padStart(2, '0');
+            const ano = ahora.getFullYear();
+            const hora = horaSelect.value;
+            djangoDateField.value = `${ano}-${mes}-${dia}T${hora}`;
+        }
+
+        diaSelect.addEventListener('change', actualizarCampoDjango);
+        mesSelect.addEventListener('change', function() {
+            poblarDias(parseInt(this.value), ahora.getFullYear());
+            actualizarCampoDjango();
+        });
+        horaSelect.addEventListener('change', actualizarCampoDjango);
+
+        actualizarCampoDjango();
+    });
+    </script>
+</body>
+</html>

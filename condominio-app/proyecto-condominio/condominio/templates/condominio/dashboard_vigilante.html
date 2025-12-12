@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard de Vigilancia</title>
+    <meta http-equiv="refresh" content="30">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1, h2 { margin: 0; padding-bottom: 15px; border-bottom: 2px solid #eee; }
+        .header .logout-link { text-decoration: none; font-weight: bold; color: #007bff; }
+        .section-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .card { background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; }
+        .card-header { background-color: #343a40; color: white; padding: 15px; }
+        .card-header h3 { margin: 0; font-size: 1.2em; }
+        .card-body { padding: 15px; }
+        .card p { margin: 0 0 10px 0; }
+        .documentos { display: flex; gap: 15px; margin-top: 15px; }
+        .documentos a { display: block; width: 100px; height: 70px; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; }
+        .documentos img { width: 100%; height: 100%; object-fit: cover; }
+        .acciones { display: flex; gap: 10px; margin-top: 15px; }
+        .btn { padding: 8px 12px; border-radius: 5px; text-decoration: none; color: white; font-size: 14px; text-align: center; }
+        .btn-entrada { background-color: #28a745; }
+        .btn-salida, .btn-devolucion { background-color: #dc3545; }
+        .btn-entrega { background-color: #007bff; }
+        .estado { font-weight: bold; padding: 3px 8px; border-radius: 4px; color: white; display: inline-block; }
+        .estado-esperando, .estado-aprobada { background-color: #ffc107; color: #333; }
+        .estado-adentro, .estado-en-uso { background-color: #007bff; }
+        .estado-completada { background-color: #6c757d; }
+        .cono-container { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 6px; margin-top: 15px; padding: 10px; text-align: center; }
+        .cono-label { font-size: 0.9em; font-weight: bold; margin: 0; }
+        .cono-numero { font-size: 2.5em; font-weight: bold; margin: 0; line-height: 1; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; width: 90%; max-width: 320px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .modal-title { margin-top: 0; margin-bottom: 20px; font-size: 1.5em; }
+        .modal-input { width: 100%; padding: 12px; font-size: 1.2em; text-align: center; border: 2px solid #ccc; border-radius: 6px; margin-bottom: 20px; }
+        .modal-actions { display: flex; justify-content: space-between; gap: 10px; }
+        .modal-btn { flex-grow: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .modal-btn-confirm { background-color: #28a745; color: white; }
+        .modal-btn-cancel { background-color: #ccc; }
+        .btn-capturar { background-color: #17a2b8; } /* Color para el nuevo botón */
+        .camera-modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .camera-modal-content { background: #333; padding: 20px; border-radius: 12px; text-align: center; width: 95%; max-width: 500px; }
+        #camera-feed { width: 100%; height: auto; border-radius: 8px; background: #111; }
+        #photo-preview { width: 100%; height: auto; border-radius: 8px; display: none; }
+        .camera-actions { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .camera-btn { padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        #btn-capture-photo { background-color: #dc3545; color: white; }
+        .upload-options { display: none; flex-direction: column; gap: 10px; }
+        .btn-upload { background-color: #28a745; color: white; }
+        #btn-retake-photo { background-color: #ffc107; color: #333; }
+        #btn-close-camera { background-color: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    {% csrf_token %}
+
+    <div class="container">
+        {% include 'condominio/_header_villa.html' %}
+        <div class="header">
+            <h1>Dashboard de Vigilancia ({{ fecha_hoy|date:"d M, Y" }})</h1>
+            <div>
+                <a href="{% url 'condominio:dashboard_gafetes' %}" class="btn" style="background-color: #17a2b8; margin-right: 15px;">Gestionar Entrega de Gafetes</a>
+                <a href="{% url 'logout' %}" class="logout-link">Cerrar Sesión</a>
+            </div>
+        </div>
+
+        <h2>Visitas Programadas</h2>
+        <div class="section-grid">
+            {% for visita in visitas %}
+                <div class="card" id="visita-card-{{ visita.id }}">
+                    <div class="card-header"><h3>{{ visita.nombre_visitante }}</h3></div>
+                    <div class="card-body">
+                        <p><strong>Casa a Visitar:</strong> {{ visita.casa.numero_casa }} ({{ visita.casa.propietario }})</p>
+                        <p><strong>Hora Programada:</strong> {{ visita.fecha_programada|date:"P" }}</p>
+                        <p><strong>Estado:</strong> <span class="estado estado-{{ visita.estado|slugify }}">{{ visita.get_estado_display }}</span></p>
+                        {% if visita.guardia_entrada %}<p><small><em>Entrada: {{ visita.guardia_entrada.username }} a las {{ visita.fecha_hora_entrada|date:"P" }}</em></small></p>{% endif %}
+                        <div id="cono-display-{{ visita.id }}" class="cono-container" style="display: none;">
+                            <p class="cono-label">Cono Asignado</p>
+                            <p class="cono-numero"></p>
+                        </div>
+                        {% if visita.foto_identificacion or visita.foto_placas %}
+                            <p><strong>Documentos:</strong></p>
+                            <div class="documentos">
+                                {% if visita.foto_identificacion %}<a href="{{ visita.foto_identificacion.url }}" target="_blank"><img src="{{ visita.foto_identificacion.url }}" alt="Identificación"></a>{% endif %}
+                                {% if visita.foto_placas %}<a href="{{ visita.foto_placas.url }}" target="_blank"><img src="{{ visita.foto_placas.url }}" alt="Placas"></a>{% endif %}
+                            </div>
+                        {% else %}<p><em>Visitante aún no ha subido sus documentos.</em></p>{% endif %}
+
+                        <div class="acciones">
+                            {% if visita.estado == 'Esperando' %}
+                                <button class="btn btn-entrada btn-marcar-entrada" data-visita-id="{{ visita.id }}" data-url="{% url 'condominio:marcar_entrada' visita.id %}">Marcar Entrada</button>
+                            {% elif visita.estado == 'Adentro' %}
+                                <a href="{% url 'condominio:marcar_salida' visita.id %}" class="btn btn-salida btn-marcar-salida" data-visita-id="{{ visita.id }}">Marcar Salida</a>
+                            {% endif %}
+                            <button class="btn btn-capturar btn-abrir-camara" data-visita-id="{{ visita.id }}">Capturar Documentos</button>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No hay visitas programadas para el día de hoy.</p>
+            {% endfor %}
+        </div>
+
+        <h2 style="margin-top: 40px;">Paquetería</h2>
+        <div class="section-grid">
+            {% for paquete in paquetes %}
+            <div class="card">
+                <div class="card-header"><h3>Paquete para Casa {{ paquete.casa.numero_casa }}</h3></div>
+                <div class="card-body">
+                    <p><strong>Residente:</strong> {{ paquete.casa.propietario }}</p>
+                    <p><strong>Remitente:</strong> {{ paquete.remitente }}</p>
+                    {% if paquete.estado == 'Esperando Llegada' %}
+                        <p><strong>Estado:</strong> <span class="estado" style="background-color:#6f42c1;">{{ paquete.get_estado_display }}</span></p>
+                        <p><strong>Código de Recogida:</strong> <code>{{ paquete.codigo_recogida }}</code></p>
+                    {% else %}
+                        <p><strong>Llegó:</strong> {{ paquete.fecha_llegada|date:"d M, Y, P" }}</p>
+                        <p><strong>Registrado por:</strong> {{ paquete.registrado_por.username }}</p>
+                    {% endif %}
+                    <div class="acciones">
+                        {% if paquete.estado == 'Esperando Llegada' %}
+                            <a href="{% url 'condominio:confirmar_llegada_paquete' paquete.id %}" class="btn" style="background-color:#fd7e14;">Confirmar Llegada</a>
+                        {% elif paquete.estado == 'En Vigilancia' %}
+                            <a href="{% url 'condominio:entregar_paquete' paquete.id %}" class="btn btn-entrega">Entregar a Residente</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+                <p>No hay paquetes pendientes.</p>
+            {% endfor %}
+        </div>
+
+        <h2 style="margin-top: 40px;">Reservaciones de Áreas Comunes</h2>
+        <div class="section-grid">
+            {% for reservacion in reservaciones %}
+            <div class="card">
+                <div class="card-header">
+                    <h3>{{ reservacion.area_comun.nombre }}</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Residente:</strong> {{ reservacion.casa.propietario }} (Casa {{ reservacion.casa.numero_casa }})</p>
+                    <p><strong>Horario:</strong> {{ reservacion.fecha_hora_inicio|date:"P" }} - {{ reservacion.fecha_hora_fin|date:"P" }}</p>
+                    <p><strong>Estado:</strong> <span class="estado estado-{{ reservacion.estado|slugify }}">{{ reservacion.get_estado_display }}</span></p>
+                     {% if reservacion.guardia_entrega %}
+                       <p><small><em>Acceso: {{ reservacion.guardia_entrega.username }} a las {{ reservacion.fecha_hora_entrega|date:"P" }}</em></small></p>
+                    {% endif %}
+                    <div class="acciones">
+                        {% if reservacion.estado == 'Aprobada' %}
+                            <a href="{% url 'condominio:iniciar_reservacion' reservacion.id %}" class="btn btn-entrega">Entregar Llave / Dar Acceso</a>
+                        {% elif reservacion.estado == 'En Uso' %}
+                            <a href="{% url 'condominio:finalizar_reservacion' reservacion.id %}" class="btn btn-devolucion">Recibir Llave / Finalizar</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+                <p>No hay áreas comunes reservadas para el día de hoy.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="cono-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 class="modal-title">Asignar Cono</h3>
+            <input type="number" inputmode="numeric" id="cono-input" class="modal-input" placeholder="No. de Cono">
+            <div class="modal-actions">
+                <button id="modal-btn-cancel" class="modal-btn modal-btn-cancel">Cancelar</button>
+                <button id="modal-btn-confirm" class="modal-btn modal-btn-confirm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="camera-modal" class="camera-modal-overlay" style="display: none;">
+        <div class="camera-modal-content">
+            <video id="camera-feed" playsinline autoplay></video>
+            <img id="photo-preview" alt="Vista previa de la foto">
+            <canvas id="photo-canvas" style="display: none;"></canvas>
+            <div class="camera-actions">
+                <button id="btn-capture-photo" class="camera-btn">Tomar Foto</button>
+                <div id="upload-options" class="upload-options">
+                    <button class="btn-upload camera-btn" data-type="ine">Subir como INE</button>
+                    <button class="btn-upload camera-btn" data-type="placas">Subir como Placas</button>
+                    <button id="btn-retake-photo" class="camera-btn">Tomar de Nuevo</button>
+                </div>
+                <button id="btn-close-camera" class="camera-btn">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lógica para los conos
+            const todasLasVisitas = document.querySelectorAll('.card[id^="visita-card-"]');
+            todasLasVisitas.forEach(card => {
+                const visitaId = card.id.split('-').pop();
+                const conoGuardado = localStorage.getItem('cono_visita_' + visitaId);
+                if (conoGuardado) {
+                    const display = document.getElementById('cono-display-' + visitaId);
+                    if (display) {
+                        display.querySelector('.cono-numero').textContent = conoGuardado;
+                        display.style.display = 'block';
+                    }
+                }
+            });
+            const conoModal = document.getElementById('cono-modal');
+            const conoInput = document.getElementById('cono-input');
+            const btnConfirmCono = document.getElementById('modal-btn-confirm');
+            const btnCancelCono = document.getElementById('modal-btn-cancel');
+            const botonesEntrada = document.querySelectorAll('.btn-marcar-entrada');
+            botonesEntrada.forEach(boton => {
+                boton.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const visitaId = this.dataset.visitaId;
+                    const url = this.dataset.url;
+                    conoModal.dataset.visitaId = visitaId;
+                    conoModal.dataset.url = url;
+                    conoModal.style.display = 'flex';
+                    conoInput.focus();
+                });
+            });
+            btnConfirmCono.addEventListener('click', () => {
+                const numeroCono = conoInput.value;
+                const visitaId = conoModal.dataset.visitaId;
+                const url = conoModal.dataset.url;
+                if (numeroCono && numeroCono.trim() !== '') {
+                    localStorage.setItem('cono_visita_' + visitaId, numeroCono);
+                    window.location.href = url;
+                } else {
+                    alert('El número de cono no puede estar vacío.');
+                }
+            });
+            const closeModalCono = () => {
+                conoInput.value = '';
+                conoModal.style.display = 'none';
+            };
+            btnCancelCono.addEventListener('click', closeModalCono);
+            conoModal.addEventListener('click', (event) => {
+                if (event.target === conoModal) {
+                    closeModalCono();
+                }
+            });
+            const botonesSalida = document.querySelectorAll('.btn-marcar-salida');
+            botonesSalida.forEach(boton => {
+                boton.addEventListener('click', function() {
+                    const visitaId = this.dataset.visitaId;
+                    localStorage.removeItem('cono_visita_' + visitaId);
+                });
+            });
+
+            // Lógica para la cámara
+            const cameraModal = document.getElementById('camera-modal');
+            const video = document.getElementById('camera-feed');
+            const canvas = document.getElementById('photo-canvas');
+            const photoPreview = document.getElementById('photo-preview');
+            const btnCapture = document.getElementById('btn-capture-photo');
+            const btnClose = document.getElementById('btn-close-camera');
+            const btnRetake = document.getElementById('btn-retake-photo');
+            const uploadOptions = document.getElementById('upload-options');
+            let currentVisitaId = null;
+            let stream = null;
+            const openCamera = async (visitaId) => {
+                currentVisitaId = visitaId;
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    video.srcObject = stream;
+                    cameraModal.style.display = 'flex';
+                    video.style.display = 'block';
+                    photoPreview.style.display = 'none';
+                    btnCapture.style.display = 'block';
+                    uploadOptions.style.display = 'none';
+                } catch (err) {
+                    console.error("Error al acceder a la cámara: ", err);
+                    alert("No se pudo acceder a la cámara. Asegúrate de dar los permisos necesarios.");
+                }
+            };
+            const closeCamera = () => {
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                cameraModal.style.display = 'none';
+                currentVisitaId = null;
+            };
+            document.querySelectorAll('.btn-abrir-camara').forEach(button => {
+                button.addEventListener('click', function() {
+                    openCamera(this.dataset.visitaId);
+                });
+            });
+            btnCapture.addEventListener('click', () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                photoPreview.src = canvas.toDataURL('image/jpeg');
+                video.style.display = 'none';
+                photoPreview.style.display = 'block';
+                btnCapture.style.display = 'none';
+                uploadOptions.style.display = 'flex';
+            });
+            btnRetake.addEventListener('click', () => {
+                video.style.display = 'block';
+                photoPreview.style.display = 'none';
+                btnCapture.style.display = 'block';
+                uploadOptions.style.display = 'none';
+            });
+            document.querySelectorAll('.btn-upload').forEach(button => {
+                button.addEventListener('click', function() {
+                    const photoType = this.dataset.type;
+                    canvas.toBlob(blob => {
+                        uploadPhoto(currentVisitaId, photoType, blob);
+                    }, 'image/jpeg', 0.9);
+                });
+            });
+            const uploadPhoto = async (visitaId, photoType, blob) => {
+                const formData = new FormData();
+                formData.append('photo', blob, `${photoType}-${visitaId}.jpg`);
+                formData.append('photo_type', photoType);
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                try {
+                    const response = await fetch(`/visita/${visitaId}/guardia-subir-foto/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: formData
+                    });
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        alert(`Foto de ${photoType.toUpperCase()} subida con éxito.`);
+                        closeCamera();
+                        window.location.reload();
+                    } else {
+                        alert(`Error al subir la foto: ${data.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error en la subida:', error);
+                    alert('Error de conexión al subir la foto.');
+                }
+            };
+            btnClose.addEventListener('click', closeCamera);
+        });
+    </script>
+</body>

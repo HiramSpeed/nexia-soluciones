@@ -1,0 +1,50 @@
+{% if villa_actual %}
+<style>
+    .villa-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #fff;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    .villa-header img.logo {
+        height: 50px;
+        width: auto;
+    }
+    .villa-info {
+        text-align: center;
+    }
+    .villa-info h1 {
+        margin: 0;
+        font-size: 24px;
+        color: #005A9C; /* Un azul corporativo */
+    }
+    .villa-info p {
+        margin: 5px 0 0 0;
+        color: #555;
+    }
+</style>
+
+<header class="villa-header">
+    {% if villa_actual.logo %}
+        <img src="{{ villa_actual.logo.url }}" alt="Logo Izquierdo" class="logo">
+    {% endif %}
+
+    <div class="villa-info">
+        <h1>{{ villa_actual.nombre }}</h1>
+        <p>
+            {{ villa_actual.direccion }}
+            {% if villa_actual.google_maps_link %}
+                - <a href="{{ villa_actual.google_maps_link }}" target="_blank">Ver en Mapa</a>
+            {% endif %}
+        </p>
+    </div>
+
+    {% if villa_actual.logo %}
+        <img src="{{ villa_actual.logo.url }}" alt="Logo Derecho" class="logo">
+    {% endif %}
+</header>
+{% endif %}
