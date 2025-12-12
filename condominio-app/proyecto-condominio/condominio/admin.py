@@ -8,7 +8,7 @@ from django.db import transaction
 from django.template.loader import render_to_string
 from django.core.files.base import ContentFile
 from django.shortcuts import get_object_or_404, redirect
-from weasyprint import HTML
+# from weasyprint import HTML # Lazy loaded in function
 from num2words import num2words
 from .models import CasaConAdeudo
 import datetime
@@ -49,6 +49,7 @@ def aprobar_abonos_seleccionados(modeladmin, request, queryset):
             # ===============================================================
 
             html_string = render_to_string('condominio/recibo_template.html', contexto_recibo)
+            from weasyprint import HTML # Lazy load
             pdf_file = HTML(string=html_string).write_pdf()
 
             if hasattr(transaccion, 'recibo_pdf'):
