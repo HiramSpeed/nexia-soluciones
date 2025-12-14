@@ -1,174 +1,236 @@
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang='es'>
 <head>
     <meta charset='utf-8' />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendario de Áreas Comunes</title>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js'></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f9f9f9; padding: 20px; }
-        .container { max-width: 1100px; margin: auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .nav-link { display: inline-block; margin-bottom: 20px; color: #007bff; text-decoration: none; }
-        #calendar { max-width: 100%; margin: 0 auto; }
-        .fc-event { cursor: pointer; border: none !important; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
-        .modal-content { background-color: #fff; padding: 30px; border-radius: 8px; width: 90%; max-width: 450px; position: relative; }
-        .close-button { position: absolute; top: 10px; right: 20px; color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .modal h2 { margin-top: 0; }
-        .modal-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        .btn-submit { background-color: #007bff; color: white; padding: 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
-        #reglas-alberca { margin-top:15px; padding:10px; background-color:#eef2f7; border-radius:5px; font-size: 0.9em; }
-        #reglas-alberca label { display: flex; align-items: center; margin-top: 10px; }
-        #reglas-alberca input { margin-right: 10px; }
-        .messages { list-style-type: none; padding: 0; margin: 0 0 20px 0; }
-        .messages li.error { background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; }
-        .form-errors { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 15px; margin-bottom: 15px; border-radius: 4px; }
+        body { font-family: 'Lato', sans-serif; background-color: #1a202c; }
+        h1, h2, h3 { font-family: 'Jura', sans-serif; }
+        
+        /* Dark mode calendar styling */
+        .fc { background-color: #2d3748; color: #e2e8f0; }
+        .fc .fc-button-primary { background-color: #4299e1; border-color: #4299e1; }
+        .fc .fc-button-primary:hover { background-color: #3182ce; }
+        .fc .fc-toolbar-title { font-size: 1.25rem; color: #e2e8f0; }
+        .fc-theme-standard td, .fc-theme-standard th { border-color: #4a5568; }
+        .fc-daygrid-day-number { color: #cbd5e0; }
+        .fc-col-header-cell-cushion { color: #a0aec0; }
+        .fc-daygrid-day.fc-day-today { background-color: rgba(66, 153, 225, 0.1) !important; }
+        
+        /* List view date headers - make bold and visible */
+        .fc-list-day-cushion { font-weight: 700 !important; color: #e2e8f0 !important; font-size: 1.1rem !important; }
+        .fc-list-event-time { color: #cbd5e0; }
+        .fc-list-event-title { color: #e2e8f0; }
+        .fc-list-day-frame { background-color: #2d3748 !important; }
+        .fc-list-table { background-color: #2d3748 !important; }
+        .fc-list-event { background-color: #374151 !important; border-color: #4b5563 !important; }
+        .fc-list-event:hover { background-color: #4b5563 !important; }
     </style>
 </head>
-<body>
-    <div class="main-container"></div>
-    {% include 'condominio/_header_villa.html' %}
+<body class="bg-gray-900">
 
-    <div class="container">
-    <a href="{% url 'dashboard' %}" class="nav-link">&larr; Volver al Panel Principal</a>
-    <h1>Calendario de Áreas Comunes</h1>
+    <div class="w-full max-w-7xl mx-auto p-4 md:p-8">
+        {% include 'condominio/_header_villa.html' %}
 
-    {% if form %}
-        <p>Haz clic en un día para solicitar una reservación.</p>
-    {% endif %}
+        <div class="bg-gray-800 p-4 sm:p-6 md:p-8 rounded-xl shadow-lg mt-8 border border-gray-700">
+            <a href="{% url 'condominio:dashboard' %}" class="inline-block mb-6 font-semibold text-blue-400 hover:text-blue-300">&larr; Volver al Panel Principal</a>
+            <h1 class="text-3xl font-bold text-gray-100 mb-2">Calendario de Áreas Comunes</h1>
 
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li class="{{ message.tags }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+            {% if messages %}
+                <ul class="my-4">
+                {% for message in messages %}
+                    <li class="p-4 mb-2 rounded-lg text-sm font-medium {% if message.tags == 'success' %}bg-green-900/50 text-green-200 border border-green-700{% else %}bg-red-900/50 text-red-200 border border-red-700{% endif %}">
+                        {{ message }}
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
 
-    <div id='calendar'></div>
-</div>
+            {% if form %}
+                <p class="text-gray-300 mb-8">Haz clic en un día para solicitar una reservación.</p>
+            {% else %}
+                 <p class="text-gray-300 mb-8">Revisa las fechas ocupadas. Para reservar, asegúrate de no tener adeudos pendientes.</p>
+            {% endif %}
 
-<div id="bookingModal" class="modal">
-    <div class="modal-content">
-        <span class="close-button">&times;</span>
-        <h2 id="modalTitle">Solicitar Reservación</h2>
-        {% if form %}
-            <form method="post" id="djangoForm">
-                {% csrf_token %}
-
-                {% if form.errors %}
-                    <div class="form-errors">
-                        <p><strong>Por favor, corrige los siguientes errores:</strong></p>
-                        {{ form.non_field_errors }}
-                        {{ form.as_ul }}
-                    </div>
-                {% endif %}
-                
-                <input type="hidden" name="fecha_hora_inicio" id="id_fecha_hora_inicio">
-                <input type="hidden" name="fecha_hora_fin" id="id_fecha_hora_fin">
-
-                <div class="form-group">{{ form.area_comun.label_tag }}{{ form.area_comun }}</div>
-                <div class="modal-form-row">
-                    <div class="form-group">
-                        <label for="id_hora_inicio">Hora de Inicio:</label>
-                        <select id="id_hora_inicio" class="form-control" required>
-                            <option value="">--:--</option>
-                            {% for hora in horas_disponibles %}<option value="{{ hora }}">{{ hora }}</option>{% endfor %}
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="id_duracion">Duración:</label>
-                        <select id="id_duracion" class="form-control"><option value="1">1 hora</option><option value="2">2 horas</option><option value="3">3 horas</option></select>
-                    </div>
-                </div>
-                <div class="form-group" id="group-cantidad-personas" style="display:none;">{{ form.cantidad_personas.label_tag }}{{ form.cantidad_personas }}</div>
-                <div id="reglas-alberca" style="display:none;">
-                    <h4>Reglas de la Alberca</h4>
-                    <ul><li>Usar traje de baño (sin ropa interior/algodón).</li><li>No se permiten bebidas o comida dentro de la alberca.</li><li>Niños siempre deben estar acompañados por un adulto.</li></ul>
-                    <p><small>Infringir las reglas puede resultar en multas o suspensión del servicio.</small></p>
-                    <label>{{ form.acepta_reglas }} {{ form.acepta_reglas.label }}</label>
-                </div>
-                <button type="submit" class="btn-submit">Enviar Solicitud</button>
-            </form>
-        {% endif %}
+            <div id='calendar'></div>
+        </div>
     </div>
-</div>
+
+    <div id="bookingModal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-md relative border border-gray-700">
+            <button id="closeButton" type="button" class="absolute top-4 right-4 text-gray-400 hover:text-gray-200">
+                <span class="sr-only">Cerrar</span>
+                <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <h2 id="modalTitle" class="text-2xl font-bold text-gray-100 mb-6">Solicitar Reservación</h2>
+
+            {% if form %}
+                <form method="post" id="djangoForm" class="space-y-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="fecha_hora_inicio" id="id_fecha_hora_inicio">
+                    <input type="hidden" name="fecha_hora_fin" id="id_fecha_hora_fin">
+
+                    <div>
+                        <label for="id_area_comun" class="block text-sm font-medium text-gray-300 mb-1">{{ form.area_comun.label }}</label>
+                        {{ form.area_comun|add_class:"mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-200" }}
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="id_hora_inicio" class="block text-sm font-medium text-gray-300 mb-1">Hora de Inicio:</label>
+                            <select id="id_hora_inicio" required class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-200">
+                                <option value="">--:--</option>
+                                {% for hora in horas_disponibles %}<option value="{{ hora }}">{{ hora }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="id_duracion" class="block text-sm font-medium text-gray-300 mb-1">Duración:</label>
+                            <select id="id_duracion" class="mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-200">
+                                <option value="1">1 hora</option>
+                                <option value="2">2 horas</option>
+                                <option value="3">3 horas</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="group-cantidad-personas" class="hidden">
+                        <label for="id_cantidad_personas" class="block text-sm font-medium text-gray-300 mb-1">{{ form.cantidad_personas.label }}</label>
+                        {{ form.cantidad_personas|add_class:"mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-200" }}
+                    </div>
+
+                    <div id="reglas-alberca" class="hidden space-y-3 p-4 bg-blue-900/30 rounded-lg border border-blue-700">
+                        <h4 class="font-bold text-gray-100">Reglas de la Alberca</h4>
+                        <ul class="list-disc list-inside text-sm text-gray-300 space-y-1">
+                            <li>Usar traje de baño (sin ropa interior/algodón).</li>
+                            <li>No se permiten bebidas o comida dentro de la alberca.</li>
+                            <li>Niños siempre deben estar acompañados por un adulto.</li>
+                        </ul>
+                        <div class="flex items-center">
+                            {{ form.acepta_reglas|add_class:"h-4 w-4 text-blue-500 bg-gray-700 border-gray-600 rounded focus:ring-blue-500" }}
+                            <label for="{{ form.acepta_reglas.id_for_label }}" class="ml-2 block text-sm text-gray-200">{{ form.acepta_reglas.label }}</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 px-4 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors">Enviar Solicitud</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // --- LÓGICA DEL CALENDARIO (con la corrección para morosos) ---
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'es',
-        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
-        events: "{% url 'reservaciones_feed' %}",
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,listMonth'
+        },
+        buttonText: {
+            today: 'Hoy',
+            month: 'Mes',
+            list:  'Lista'
+        },
+        events: "{% url 'condominio:reservaciones_feed' %}",
+
         dateClick: function(info) {
-            {% if form %} // <-- CORRECCIÓN 1: Si no hay form (por morosidad), este bloque no se ejecuta
+            {% if form %}
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
+
                 if (info.date < today) {
                     alert("No puedes seleccionar una fecha en el pasado.");
                     return;
                 }
-                
-                // Pre-llenamos datos y mostramos el modal
+
                 document.getElementById('modalTitle').innerText = `Reservar para el ${info.date.toLocaleDateString('es-ES', {weekday: 'long', day: 'numeric', month: 'long'})}`;
-                
-                // CORRECCIÓN 3: Lógica para el botón de envío
-                const form = document.getElementById('djangoForm');
-                const selectedDate = info.dateStr; // YYYY-MM-DD
+                const formEl = document.getElementById('djangoForm');
+                const selectedDate = info.dateStr;
                 const horaInicioSelect = document.getElementById('id_hora_inicio');
                 const duracionSelect = document.getElementById('id_duracion');
-                
-                form.onsubmit = function() {
-                    const horaInicio = horaInicioSelect.value;
-                    if (!horaInicio) {
-                        alert('Por favor, selecciona una hora de inicio.');
-                        return false; // Detiene el envío del formulario
-                    }
-                    const duracion = parseInt(duracionSelect.value);
-                    const inicioDT = new Date(`${selectedDate}T${horaInicio}`);
-                    const finDT = new Date(inicioDT.getTime() + duracion * 60 * 60 * 1000);
-                    
-                    document.getElementById('id_fecha_hora_inicio').value = inicioDT.toISOString().slice(0, 16);
-                    document.getElementById('id_fecha_hora_fin').value = finDT.toISOString().slice(0, 16);
-                };
 
-                document.getElementById('bookingModal').style.display = 'flex';
+                // ... dentro de tu script, justo después de la línea "dateClick: function(info) {"
+
+          formEl.onsubmit = function(e) {
+              const horaInicio = horaInicioSelect.value;
+              if (!horaInicio) {
+                  alert('Por favor, selecciona una hora de inicio.');
+                  e.preventDefault();
+                  return false;
+              }
+
+              // Creamos el objeto de fecha de inicio. El navegador lo interpreta en hora local.
+              const inicioDT = new Date(`${selectedDate}T${horaInicio}`);
+
+              // Calculamos la fecha de fin sumando las horas
+              const duracion = parseInt(duracionSelect.value);
+              const finDT = new Date(inicioDT.getTime() + duracion * 60 * 60 * 1000);
+
+              // --- INICIO DEL CAMBIO IMPORTANTE ---
+
+              // Función auxiliar para formatear la fecha en formato YYYY-MM-DD HH:MM
+              // usando los componentes de la hora local, no UTC.
+              function formatLocalDateTime(dt) {
+                  const pad = (num) => num.toString().padStart(2, '0');
+
+                  const year = dt.getFullYear();
+                  const month = pad(dt.getMonth() + 1); // getMonth() es 0-11
+                  const day = pad(dt.getDate());
+                  const hours = pad(dt.getHours());
+                  const minutes = pad(dt.getMinutes());
+
+                  return `${year}-${month}-${day} ${hours}:${minutes}`;
+              }
+
+
+              document.getElementById('id_fecha_hora_inicio').value = formatLocalDateTime(inicioDT);
+              document.getElementById('id_fecha_hora_fin').value = formatLocalDateTime(finDT);
+
+
+          };
+
+
+
+                document.getElementById('bookingModal').classList.remove('hidden');
             {% endif %}
         }
     });
     calendar.render();
 
-    // --- LÓGICA DEL MODAL Y CAMPOS DINÁMICOS (sin cambios) ---
+    // Lógica para manejar el modal
     const modal = document.getElementById('bookingModal');
-    if (modal) { // Solo si el modal existe
-        const closeButton = modal.querySelector('.close-button');
-        closeButton.onclick = function() { modal.style.display = 'none'; }
-        window.onclick = function(event) { if (event.target == modal) { modal.style.display = 'none'; } }
-        
+    if (modal && {% if form %}true{% else %}false{% endif %}) {
+        const closeButton = document.getElementById('closeButton');
+        function closeModal() { modal.classList.add('hidden'); }
+        closeButton.onclick = closeModal;
+        modal.addEventListener('click', function(event) { if (event.target === modal) { closeModal(); } });
+
         const areaSelect = document.getElementById('id_area_comun');
         const reglasDiv = document.getElementById('reglas-alberca');
-        const cantidadPersonasDiv = document.querySelector('#id_cantidad_personas').parentElement;
-        const aceptaReglasCheckbox = document.querySelector('#id_acepta_reglas').parentElement;
+        const cantidadPersonasDiv = document.getElementById('group-cantidad-personas');
+        const aceptaReglasInput = document.getElementById('id_acepta_reglas');
 
         function toggleAreaFields() {
-            const selectedOption = areaSelect.options[areaSelect.selectedIndex].text.toLowerCase();
-            const esAlberca = selectedOption.includes('alberca');
-            const esTerraza = selectedOption.includes('terraza');
-            
+            if (!areaSelect) return;
+            const selectedOptionText = areaSelect.options[areaSelect.selectedIndex].text.toLowerCase();
+            const esAlberca = selectedOptionText.includes('alberca');
+            const esTerraza = selectedOptionText.includes('terraza');
+
             reglasDiv.style.display = esAlberca ? 'block' : 'none';
-            aceptaReglasCheckbox.style.display = esAlberca ? 'block' : 'none';
-            document.getElementById('id_acepta_reglas').required = esAlberca;
-            
+            aceptaReglasInput.required = esAlberca;
+
             cantidadPersonasDiv.style.display = (esAlberca || esTerraza) ? 'block' : 'none';
             document.getElementById('id_cantidad_personas').required = (esAlberca || esTerraza);
         }
-
         areaSelect.addEventListener('change', toggleAreaFields);
-        toggleAreaFields();
+        toggleAreaFields(); // Llamar una vez al inicio para establecer el estado correcto
     }
 });
 </script>
