@@ -1,50 +1,72 @@
+{% load static %}
 {% if villa_actual %}
 <style>
     .villa-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background-color: #fff;
-        padding: 15px 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        background-color: var(--card-background);
+        /* Uso de variable */
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         margin-bottom: 30px;
+        border: 1px solid #4a5568;
     }
+
     .villa-header img.logo {
-        height: 50px;
+        height: 60px;
         width: auto;
     }
+
+    /* Logo principal (NexIA) más grande si es necesario */
+    .villa-header img.logo-nexia {
+        height: 50px;
+    }
+
     .villa-info {
         text-align: center;
     }
+
     .villa-info h1 {
         margin: 0;
-        font-size: 24px;
-        color: #005A9C; /* Un azul corporativo */
+        font-size: 28px;
+        color: var(--primary-color);
+        font-family: var(--font-heading);
     }
+
     .villa-info p {
         margin: 5px 0 0 0;
-        color: #555;
+        color: var(--secondary-text-color);
+    }
+
+    .villa-info a {
+        color: var(--info-color);
+        text-decoration: underline;
     }
 </style>
 
 <header class="villa-header">
-    {% if villa_actual.logo %}
-        <img src="{{ villa_actual.logo.url }}" alt="Logo Izquierdo" class="logo">
-    {% endif %}
+    <div class="logo-area">
+        <!-- Logo NexIA izq (estático) -->
+        <img src="{% static 'condominio/img/logo.png' %}" alt="NexIA Soluciones" class="logo logo-nexia">
+    </div>
 
     <div class="villa-info">
         <h1>{{ villa_actual.nombre }}</h1>
         <p>
             {{ villa_actual.direccion }}
             {% if villa_actual.google_maps_link %}
-                - <a href="{{ villa_actual.google_maps_link }}" target="_blank">Ver en Mapa</a>
+            - <a href="{{ villa_actual.google_maps_link }}" target="_blank">Ver en Mapa</a>
             {% endif %}
         </p>
     </div>
 
-    {% if villa_actual.logo %}
-        <img src="{{ villa_actual.logo.url }}" alt="Logo Derecho" class="logo">
-    {% endif %}
+    <div class="logo-area">
+        <!-- Logo Villa derecha (dinámico) -->
+        {% if villa_actual.logo %}
+        <img src="{{ villa_actual.logo.url }}" alt="Logo Villa" class="logo">
+        {% endif %}
+    </div>
 </header>
 {% endif %}

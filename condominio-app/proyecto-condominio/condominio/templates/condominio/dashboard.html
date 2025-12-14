@@ -1,187 +1,359 @@
 <!DOCTYPE html>
 {% load static %}
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Mi Panel de Residente</title>
+    <title>Mi Panel de Residente - NexIA Soluciones</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'condominio/css/nexia-theme.css' %}">
     <style>
-        /* Estilos optimizados para un look limpio y profesional */
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-        .estado-aprobado { background-color: #f0fff4; }
-        .estado-pendiente-de-aprobacion { background-color: #fffaf0; }
+        /* Estilos específicos del Dashboard (que no están en nexia-theme.css) */
+
+        .welcome-title {
+            text-align: left;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            color: var(--text-color);
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .grid-buttons {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .dashboard-card-link {
+            display: block;
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            border: 1px solid #4a5568;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .dashboard-card-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary-color);
+        }
+
+        .alert-box {
+            background-color: rgba(237, 137, 54, 0.1);
+            /* Naranja transparente */
+            border-left: 4px solid var(--warning-color);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 30px 0;
+            color: #FBD38D;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #4a5568;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            margin-top: 40px;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .nexia-table-container {
+            overflow-x: auto;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .nexia-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .nexia-table th {
+            background-color: #232d3b;
+            /* Un poco más oscuro que el card */
+            color: var(--muted-text-color);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .nexia-table td {
+            padding: 15px;
+            border-bottom: 1px solid #4a5568;
+            color: var(--text-color);
+        }
+
+        .nexia-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid #4a5568;
+        }
+
+        /* Utilidades de color específicas */
+        .color-red {
+            color: var(--danger-color);
+        }
+
+        .color-green {
+            color: var(--success-color);
+        }
+
+        .color-blue {
+            color: var(--info-color);
+        }
+
+        .color-primary {
+            color: var(--primary-color);
+        }
+
+        .color-warning {
+            color: var(--warning-color);
+        }
+
+        .alert-message {
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: var(--muted-text-color);
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-gray-700">
+
+<body>
 
     {% include 'condominio/_header_villa.html' %}
 
-    <main class="max-w-7xl mx-auto p-4 md:p-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mt-6 mb-8">¡Bienvenido, {{ user.username }}!</h1>
+    <main class="nexia-container">
+        <h1 class="welcome-title">¡Bienvenido, {{ user.username }}!</h1>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h2 class="text-lg font-semibold text-gray-600 mb-2">Mi Saldo Actual</h2>
+        <div class="nexia-grid-2">
+            <!-- Tarjeta de Saldo -->
+            <div class="nexia-card">
+                <h2 class="text-muted">Mi Saldo Actual</h2>
                 {% if casa.saldo > 0 %}
-                    <p class="text-4xl font-bold text-red-500">${{ casa.saldo }}</p>
-                    <p class="text-gray-500 mt-1">Tienes un adeudo pendiente.</p>
-                {% elif casa.saldo < 0 %}
-                    <p class="text-4xl font-bold text-green-500">${{ casa.saldo|stringformat:".2f"|slice:"1:" }}</p>
-                    <p class="text-gray-500 mt-1">Tienes saldo a favor. ¡Gracias!</p>
-                {% else %}
-                    <p class="text-4xl font-bold text-blue-500">$0.00</p>
-                    <p class="text-gray-500 mt-1">Estás al corriente en tus pagos.</p>
-                {% endif %}
+                <p class="balance-amount color-red">${{ casa.saldo }}</p>
+                <p class="alert-message">Tienes un adeudo pendiente.</p>
+                {% elif casa.saldo < 0 %} <p class="balance-amount color-green">${{
+                    casa.saldo|stringformat:".2f"|slice:"1:" }}</p>
+                    <p class="alert-message">Tienes saldo a favor. ¡Gracias!</p>
+                    {% else %}
+                    <p class="balance-amount color-primary">$0.00</p>
+                    <p class="alert-message">Estás al corriente en tus pagos.</p>
+                    {% endif %}
             </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <h2 class="text-lg font-semibold text-gray-600 mb-2">Registrar un Pago</h2>
-                <form action="{% url 'registrar_abono' %}" method="post" enctype="multipart/form-data" class="space-y-3">
+
+            <!-- Tarjeta de Pago -->
+            <div class="nexia-card">
+                <h2 class="text-muted">Registrar un Pago</h2>
+                <form action="{% url 'registrar_abono' %}" method="post" enctype="multipart/form-data"
+                    style="margin-top: 15px;">
                     {% csrf_token %}
-                    <div>
-                        <label for="id_monto" class="block text-sm font-medium text-gray-700">Monto Pagado:</label>
+                    <div style="margin-bottom: 15px;">
+                        <label for="id_monto" style="display:block; margin-bottom:5px; font-weight:500;">Monto
+                            Pagado:</label>
                         {{ abono_form.monto }}
+                        <!-- Nota: Asegúrate de que el form renderice con clase nexia-input o modifica widget_tweaks en views si es necesario.
+                             Si no puedes cambiar la view, la clase css 'nexia-input' debería agregarse.
+                             Como workaround rápido, podemos aplicar estilo global a inputs dentro de nexia-card
+                        -->
+                        <style>
+                            .nexia-card input[type="text"],
+                            .nexia-card input[type="number"],
+                            .nexia-card input[type="file"] {
+                                width: 100%;
+                                padding: 8px;
+                                background: var(--input-background);
+                                border: 1px solid #4a5568;
+                                color: white;
+                                border-radius: 6px;
+                            }
+                        </style>
                     </div>
-                    <div>
-                        <label for="id_comprobante" class="block text-sm font-medium text-gray-700">Comprobante:</label>
+                    <div style="margin-bottom: 20px;">
+                        <label for="id_comprobante"
+                            style="display:block; margin-bottom:5px; font-weight:500;">Comprobante:</label>
                         {{ abono_form.comprobante }}
                     </div>
-                    <button type="submit" class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300">
+                    <button type="submit" class="nexia-btn nexia-btn-success nexia-btn-block">
                         Enviar para Aprobación
                     </button>
                 </form>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <a href="{% url 'vista_reservaciones' %}" class="block p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow text-center">
-                <h2 class="text-xl font-bold text-cyan-700">Reservar Área Común</h2>
-                <p class="text-gray-500 mt-2">Consulta y reserva la alberca, terraza y más.</p>
+        <!-- Botones de Acción -->
+        <div class="grid-buttons">
+            <a href="{% url 'vista_reservaciones' %}" class="dashboard-card-link">
+                <h2 class="color-blue" style="border:none;">Reservar Área Común</h2>
+                <p class="text-muted">Consulta y reserva la alberca, terraza y más.</p>
             </a>
-            <a href="{% url 'propuestas_lista' %}" class="block p-6 bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow text-center">
-                <h2 class="text-xl font-bold text-orange-700">Votaciones y Propuestas</h2>
-                <p class="text-gray-500 mt-2">Participa en las decisiones de la comunidad.</p>
+            <a href="{% url 'propuestas_lista' %}" class="dashboard-card-link">
+                <h2 class="color-warning" style="border:none;">Votaciones y Propuestas</h2>
+                <p class="text-muted">Participa en las decisiones de la comunidad.</p>
             </a>
         </div>
 
         {% if propuestas_activas %}
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-r-lg my-8 shadow-sm">
+        <div class="alert-box">
             <h3 class="font-bold">📢 ¡Votaciones Activas!</h3>
-            <p>Hay propuestas importantes que requieren tu voto. <a href="{% url 'propuestas_lista' %}" class="font-semibold underline hover:text-yellow-900">Ir a Votaciones</a></p>
+            <p>Hay propuestas importantes que requieren tu voto. <a href="{% url 'propuestas_lista' %}"
+                    style="text-decoration: underline; color: inherit; font-weight:bold;">Ir a Votaciones</a></p>
         </div>
         {% endif %}
 
+        <!-- Tablas de Información -->
         <div class="space-y-12">
+
+            <!-- Estado de Cuenta -->
             <div>
-    <h2 class="text-2xl font-semibold text-gray-800 border-b-2 border-gray-200 pb-2 mb-4">Mi Estado de Cuenta</h2>
-    <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
-        <table class="w-full text-sm text-left">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                <tr>
-                    <th class="py-3 px-6">Fecha</th>
-                    <th class="py-3 px-6">Concepto</th>
-                    <th class="py-3 px-6">Cargo</th>
-                    <th class="py-3 px-6">Abono</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for transaccion in transacciones %}
-                <tr class="border-b">
-                    <td class="py-4 px-6">{{ transaccion.fecha|date:"d M, Y" }}</td>
-                    <td class="py-4 px-6">{{ transaccion.concepto }}</td>
-                    <td class="py-4 px-6 text-red-600 font-semibold">
-                        {% if transaccion.tipo == 'CARGO' %}${{ transaccion.monto }}{% else %}-{% endif %}
-                    </td>
-
-                    <td class="py-4 px-6 text-green-600 font-semibold">
-                        {% if transaccion.tipo == 'ABONO' %}
-                            <div class="flex justify-between items-center">
-                                <span>${{ transaccion.monto }}</span>
-
-                                {% if transaccion.estado_aprobacion == 'APROBADO' and transaccion.recibo_pdf %}
-                                    <a href="{% url 'descargar_recibo_transaccion' transaccion.id %}"
-                                       class="ml-4 text-xs bg-blue-500 text-white font-bold py-1 px-2 rounded hover:bg-blue-600 no-underline">
-                                       Descargar Recibo
-                                    </a>
-                                {% endif %}
-                            </div>
-                        {% else %}
-                            -
-                        {% endif %}
-                    </td>
-                    </tr>
-                {% empty %}
-                <tr><td colspan="4" class="text-center py-6 text-gray-500">No hay transacciones registradas.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-            <div>
-                <div class="flex justify-between items-center border-b-2 border-gray-200 pb-2 mb-4">
-                    <h2 class="text-2xl font-semibold text-gray-800">Mis Vehículos</h2>
-                    <a href="{% url 'agregar_vehiculo' %}" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">+ Añadir Vehículo</a>
-                </div>
-                <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
-                   <table class="w-full text-sm text-left">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                <h2 class="section-header">Mi Estado de Cuenta</h2>
+                <div class="nexia-table-container">
+                    <table class="nexia-table">
+                        <thead>
                             <tr>
-                                <th class="py-3 px-6">Placa</th>
-                                <th class="py-3 px-6">Marca y Modelo</th>
-                                <th class="py-3 px-6">Color</th>
-                                <th class="py-3 px-6">Estado</th>
-                                <th class="py-3 px-6">Acciones</th>
+                                <th>Fecha</th>
+                                <th>Concepto</th>
+                                <th>Cargo</th>
+                                <th>Abono</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaccion in transacciones %}
+                            <tr>
+                                <td>{{ transaccion.fecha|date:"d M, Y" }}</td>
+                                <td>{{ transaccion.concepto }}</td>
+                                <td class="color-red font-bold">
+                                    {% if transaccion.tipo == 'CARGO' %}${{ transaccion.monto }}{% else %}-{% endif %}
+                                </td>
+                                <td class="color-green font-bold">
+                                    {% if transaccion.tipo == 'ABONO' %}
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span>${{ transaccion.monto }}</span>
+                                        {% if transaccion.estado_aprobacion == 'APROBADO' and transaccion.recibo_pdf %}
+                                        <a href="{% url 'descargar_recibo_transaccion' transaccion.id %}"
+                                            class="nexia-btn nexia-btn-primary"
+                                            style="padding: 2px 8px; font-size: 0.75rem;">
+                                            Descargar Recibo
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No hay transacciones registradas.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vehículos -->
+            <div>
+                <div class="section-header">
+                    <h2>Mis Vehículos</h2>
+                    <a href="{% url 'agregar_vehiculo' %}" class="nexia-btn nexia-btn-primary">+ Añadir Vehículo</a>
+                </div>
+                <div class="nexia-table-container">
+                    <table class="nexia-table">
+                        <thead>
+                            <tr>
+                                <th>Placa</th>
+                                <th>Marca y Modelo</th>
+                                <th>Color</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for vehiculo in vehiculos %}
-                            <tr class="border-b estado-{{ vehiculo.estado|slugify }}">
-                                <td class="py-4 px-6 font-medium text-gray-900">{{ vehiculo.placa }}</td>
-                                <td class="py-4 px-6">{{ vehiculo.marca }} {{ vehiculo.modelo }}</td>
-                                <td class="py-4 px-6">{{ vehiculo.color }}</td>
-                                <td class="py-4 px-6 font-semibold">{{ vehiculo.get_estado_display }}</td>
-                                <td class="py-4 px-6">
+                            <tr>
+                                <td class="font-bold">{{ vehiculo.placa }}</td>
+                                <td>{{ vehiculo.marca }} {{ vehiculo.modelo }}</td>
+                                <td>{{ vehiculo.color }}</td>
+                                <td class="font-bold">{{ vehiculo.get_estado_display }}</td>
+                                <td>
                                     {% if vehiculo.estado != 'Aprobado' %}
-                                        <a href="{% url 'eliminar_vehiculo' vehiculo.id %}" class="font-medium text-red-600 hover:underline">Eliminar</a>
+                                    <a href="{% url 'eliminar_vehiculo' vehiculo.id %}" class="color-red"
+                                        style="text-decoration:underline;">Eliminar</a>
                                     {% else %}-{% endif %}
                                 </td>
                             </tr>
                             {% empty %}
-                            <tr><td colspan="5" class="text-center py-6 text-gray-500">No tienes vehículos registrados.</td></tr>
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No tienes vehículos registrados.</td>
+                            </tr>
                             {% endfor %}
                         </tbody>
-                   </table>
+                    </table>
                 </div>
             </div>
 
+            <!-- Visitas -->
             <div id="visitas">
-                <div class="flex justify-between items-center border-b-2 border-gray-200 pb-3 mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800">Mis Visitas</h2>
-                    <a href="{% url 'registrar_visita' %}" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">+ Registrar Visita</a>
+                <div class="section-header">
+                    <h2>Mis Visitas</h2>
+                    <a href="{% url 'registrar_visita' %}" class="nexia-btn nexia-btn-primary">+ Registrar Visita</a>
                 </div>
-                <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
-                    </div>
+                <!-- Contenedor vacío en original, mantenemos estructura -->
+                <div class="nexia-table-container"></div>
             </div>
 
+            <!-- Paquetería -->
             <div id="paqueteria">
-                <div class="flex justify-between items-center border-b-2 border-gray-200 pb-3 mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800">Mi Paquetería</h2>
-                    <a href="{% url 'residente_registrar_paquete' %}" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">+ Registrar Paquete</a>
+                <div class="section-header">
+                    <h2>Mi Paquetería</h2>
+                    <a href="{% url 'residente_registrar_paquete' %}" class="nexia-btn nexia-btn-primary">+ Registrar
+                        Paquete</a>
                 </div>
-                <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
-                    </div>
+                <!-- Contenedor vacío en original, mantenemos estructura -->
+                <div class="nexia-table-container"></div>
             </div>
 
         </div>
 
-        <div class="flex items-center justify-center space-x-4 mt-12 pt-8 border-t border-gray-200">
-            <a href="{% url 'password_change' %}" class="bg-gray-200 text-gray-800 font-semibold py-2 px-5 rounded-lg hover:bg-gray-300">
+        <div class="footer-actions">
+            <a href="{% url 'password_change' %}" class="nexia-btn" style="background-color: #718096; color: white;">
                 Cambiar Contraseña
             </a>
-            <form action="{% url 'logout' %}" method="post" class="inline-block">
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
                 {% csrf_token %}
-                <button type="submit" class="bg-red-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-red-700">
+                <button type="submit" class="nexia-btn nexia-btn-danger">
                     Cerrar Sesión
                 </button>
             </form>
@@ -189,4 +361,5 @@
 
     </main>
 </body>
+
 </html>
