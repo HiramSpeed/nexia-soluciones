@@ -56,13 +56,13 @@
                 {% if casa.saldo > 0 %}
                 <p class="text-4xl font-bold text-red-500">${{ casa.saldo }}</p>
                 <p class="text-gray-200 mt-1">Tienes un adeudo pendiente.</p>
-                {% elif casa.saldo < 0 %} <p class="text-4xl font-bold text-green-500">${{
-                    casa.saldo|stringformat:".2f"|slice:"1:" }}</p>
-                    <p class="text-gray-200 mt-1">Tienes saldo a favor. ¡Gracias!</p>
-                    {% else %}
-                    <p class="text-4xl font-bold text-blue-500">$0.00</p>
-                    <p class="text-gray-200 mt-1">Estás al corriente en tus pagos.</p>
-                    {% endif %}
+                {% elif casa.saldo < 0 %}
+                <p class="text-4xl font-bold text-green-500">{{ casa.saldo|stringformat:".2f"|slice:"1:" }}</p>
+                <p class="text-gray-200 mt-1">Tienes saldo a favor. ¡Gracias!</p>
+                {% else %}
+                <p class="text-4xl font-bold text-blue-500">$0.00</p>
+                <p class="text-gray-200 mt-1">Estás al corriente en tus pagos.</p>
+                {% endif %}
             </div>
 
             <div class="bg-[#2d3748] p-6 rounded-lg shadow-md">
