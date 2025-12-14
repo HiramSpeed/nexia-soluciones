@@ -56,8 +56,10 @@
                 {% if casa.saldo > 0 %}
                 <p class="text-4xl font-bold text-red-500">${{ casa.saldo }}</p>
                 <p class="text-gray-200 mt-1">Tienes un adeudo pendiente.</p>
-                {% elif casa.saldo < 0 %}
-                <p class="text-4xl font-bold text-green-500">${{ casa.saldo|stringformat:".2f"|slice:"1:" }}</p>
+                {% elif casa.saldo < 0 %}
+
+                <p class="text-4xl font-bold text-green-500">${{ casa.saldo|stringformat:".2f"|slice:"1:" }}</p>
+
                     <p class="text-gray-200 mt-1">Tienes saldo a favor. ¡Gracias!</p>
                     {% else %}
                     <p class="text-4xl font-bold text-blue-500">$0.00</p>
@@ -165,10 +167,18 @@
                                 <td class="py-4 px-6">{{ transaccion.fecha|date:"d M, Y" }}</td>
                                 <td class="py-4 px-6">{{ transaccion.concepto }}</td>
                                 <td class="py-4 px-6 text-red-600 font-semibold">
-                                    {% if transaccion.tipo == 'CARGO' %}${{ transaccion.monto }}{% else %}-{% endif %}
+                                    {% if transaccion.tipo == 'CARGO' %}
+                                        ${{ transaccion.monto }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
                                 </td>
                                 <td class="py-4 px-6 text-green-600 font-semibold">
-                                    {% if transaccion.tipo == 'ABONO' %}${{ transaccion.monto }}{% else %}-{% endif %}
+                                    {% if transaccion.tipo == 'ABONO' %}
+                                        ${{ transaccion.monto }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
                                 </td>
                                 <td class="py-4 px-6">
                                     {% if transaccion.estado_aprobacion == 'APROBADO' %}
@@ -185,17 +195,18 @@
                                 </td>
 
                                 <td class="py-4 px-6">
-                                    {% if transaccion.tipo == 'ABONO' and transaccion.estado_aprobacion == 'APROBADO' and transaccion.recibo_pdf %}
-                                    <a href="{% url 'condominio:descargar_recibo_transaccion' transaccion.id %}"
-                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
-                                            </path>
-                                        </svg>
-                                        Recibo
-                                    </a>
+                                    {% if transaccion.tipo == 'ABONO' %}
+                                        {% if transaccion.estado_aprobacion == 'APROBADO' %}
+                                            {% if transaccion.recibo_pdf %}
+                                            <a href="{% url 'condominio:descargar_recibo_transaccion' transaccion.id %}"
+                                                class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                                </svg>
+                                                Recibo
+                                            </a>
+                                            {% endif %}
+                                        {% endif %}
                                     {% endif %}
                                 </td>
                             </tr>
