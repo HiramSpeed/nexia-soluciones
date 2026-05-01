@@ -1,0 +1,207 @@
+/* nexia-theme.css */
+
+/* Importar Fuentes */
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+
+:root {
+    /* Marca */
+    --primary-color: #00A3FF;
+    /* Azul Tech Vibrante */
+    --primary-hover: #0081CC;
+    /* Estado Hover */
+    --secondary-color: #718096;
+    /* Gris para elementos secundarios */
+
+    /* Fondos */
+    --background-color: #1a202c;
+    /* Azul Oscuro Profundo (Fondo Main) */
+    --card-background: #2d3748;
+    /* Gris Azulado (Tarjetas/Paneles) */
+    --header-background: #2d3748;
+    --input-background: #4a5568;
+    /* Gris para inputs */
+
+    /* Textos */
+    --text-color: #FFFFFF;
+    /* Blanco Puro */
+    --secondary-text-color: #E2E8F0;
+    /* Blanco Hueso */
+    --muted-text-color: #A0AEC0;
+    /* Gris suave */
+    --success-color: #48BB78;
+    /* Verde éxito */
+    --danger-color: #F56565;
+    /* Rojo peligro */
+    --warning-color: #ED8936;
+    /* Naranja advertencia */
+    --info-color: #4299E1;
+    /* Azul informativo */
+
+    /* Tipografía */
+    --font-main: 'Lato', sans-serif;
+    --font-heading: 'Jura', sans-serif;
+
+    /* Espaciado */
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    color: var(--text-color);
+    margin-top: 0;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary-hover);
+}
+
+/* --- Componentes Generales --- */
+
+/* Cards (Contenedores) */
+.nexia-card {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    padding: var(--spacing-lg);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    margin-bottom: var(--spacing-lg);
+}
+
+.nexia-card h2 {
+    font-size: 1.25rem;
+    margin-bottom: var(--spacing-md);
+    border-bottom: 2px solid #4a5568;
+    padding-bottom: var(--spacing-sm);
+}
+
+/* Botones */
+.nexia-btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.nexia-btn:active {
+    transform: scale(0.98);
+}
+
+.nexia-btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.nexia-btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.nexia-btn-success {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.nexia-btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.nexia-btn-block {
+    display: block;
+    width: 100%;
+}
+
+/* Inputs */
+.nexia-input {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--input-background);
+    border: 1px solid #4a5568;
+    border-radius: 8px;
+    color: white;
+    font-family: var(--font-main);
+    box-sizing: border-box;
+}
+
+.nexia-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(0, 163, 255, 0.2);
+}
+
+/* Grid Layout Básico */
+.nexia-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+.nexia-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+}
+
+@media (min-width: 768px) {
+    .nexia-grid-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Utilidades de Texto */
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-muted {
+    color: var(--muted-text-color);
+}
+
+.text-success {
+    color: var(--success-color);
+}
+
+.text-danger {
+    color: var(--danger-color);
+}
+
+.text-xl {
+    font-size: 1.5rem;
+}
+
+.text-2xl {
+    font-size: 2rem;
+}
+
+.font-bold {
+    font-weight: 700;
+}

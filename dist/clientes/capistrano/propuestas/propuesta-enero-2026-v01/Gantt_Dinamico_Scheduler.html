@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexia Scheduler - Visualizador Dinámico</title>
+    <style>
+        :root {
+            --nexia-dark: #0B1C33;
+            --nexia-blue: #1C4E80;
+            --nexia-cyan: #00D4FF;
+            --white: #ffffff;
+            --changeover: #FFD166;
+            /* Amarillo para cambios */
+            --running: #4ECDC4;
+            /* Verde para operación */
+            --urgent: #FF6B6B;
+            /* Rojo para urgencias */
+            --grid-line: #2A3B55;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--nexia-dark);
+            color: var(--white);
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--nexia-cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p {
+            text-align: center;
+            color: #8892b0;
+            margin-bottom: 30px;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        button {
+            background-color: var(--urgent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        /* SCHEDULER CONTAINER */
+        .scheduler-wrapper {
+            overflow-x: auto;
+            background: #112240;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .timeline-header {
+            display: flex;
+            margin-left: 150px;
+            /* Espacio para etiquetas */
+            border-bottom: 1px solid var(--nexia-cyan);
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .time-slot {
+            min-width: 100px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--nexia-cyan);
+            border-left: 1px solid var(--grid-line);
+            padding: 5px 0;
+        }
+
+        .lane {
+            display: flex;
+            align-items: center;
+            height: 60px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .lane-label {
+            width: 150px;
+            font-weight: bold;
+            color: var(--white);
+            text-align: right;
+            padding-right: 20px;
+            font-size: 0.9rem;
+            position: sticky;
+            left: 0;
+            background: #112240;
+            z-index: 10;
+        }
+
+        .track {
+            display: flex;
+            position: relative;
+            flex-grow: 1;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 4px;
+        }
+
+        /* BLOQUES DE PRODUCCIÓN */
+        .block {
+            position: absolute;
+            height: 40px;
+            top: 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #000;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .block:hover::after {
+            content: attr(data-info);
+            position: absolute;
+            bottom: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            z-index: 100;
+        }
+
+        .type-prod {
+            background-color: var(--running);
+        }
+
+        .type-setup {
+            background-color: var(--changeover);
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0, 0, 0, 0.1) 5px, rgba(0, 0, 0, 0.1) 10px);
+        }
+
+        .type-urgent {
+            background-color: var(--urgent);
+            border: 2px solid #fff;
+        }
+
+        /* LINEA DE TIEMPO ACTUAL */
+        .current-time-line {
+            position: absolute;
+            left: 320px;
+            /* Simula las 9:00 AM */
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: red;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .current-time-label {
+            position: absolute;
+            top: -25px;
+            left: -25px;
+            background: red;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.7rem;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            font-size: 0.8rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            display: inline-block;
+            margin-right: 5px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Visualizador de Flujo & Cambios</h1>
+    <p>Visualiza el impacto de los cambios (Changeovers) en la Línea de Salchichas</p>
+
+    <div class="controls">
+        <p style="margin:0 0 10px 0; color:white;">Escenario: Planeación liberó el programa ayer, pero Ventas pide un
+            cambio urgente hoy a las 9:00 AM.</p>
+        <button onclick="injectUrgency()">🚨 Insertar Pedido Urgente "Salchicha Asar"</button>
+    </div>
+
+    <div class="scheduler-wrapper">
+        <div class="timeline-header">
+            <div class="time-slot">6:00 AM</div>
+            <div class="time-slot">7:00 AM</div>
+            <div class="time-slot">8:00 AM</div>
+            <div class="time-slot">9:00 AM</div>
+            <div class="time-slot">10:00 AM</div>
+            <div class="time-slot">11:00 AM</div>
+            <div class="time-slot">12:00 PM</div>
+            <div class="time-slot">1:00 PM</div>
+            <div class="time-slot">2:00 PM</div>
+        </div>
+
+        <div class="current-time-line" id="nowLine">
+            <div class="current-time-label">AHORA (9:15)</div>
+        </div>
+
+        <div class="lane">
+            <div class="lane-label">Mezclado (Pastas)</div>
+            <div class="track" id="track-mezcla">
+                <div class="block type-prod" style="left: 0px; width: 150px;" data-info="Pasta Viena (Batch 1)">Pasta
+                    Viena</div>
+                <div class="block type-setup" style="left: 150px; width: 30px;" data-info="Limpieza Mezcladora (20m)">⚙️
+                </div>
+                <div class="block type-prod" style="left: 180px; width: 150px;" data-info="Pasta Pavo (Batch 2)">Pasta
+                    Pavo</div>
+                <div class="block type-prod" id="mezcla-future" style="left: 330px; width: 200px;"
+                    data-info="Pasta SalchiJocho (Batch 3)">Pasta SalchiJocho</div>
+            </div>
+        </div>
+
+        <div class="lane">
+            <div class="lane-label">Embutido</div>
+            <div class="track" id="track-embutido">
+                <div class="block type-prod" style="left: 50px; width: 150px;" data-info="Embutido Viena">Emb. Viena
+                </div>
+                <div class="block type-setup" style="left: 200px; width: 40px;" data-info="Cambio Tripa/Boquilla">⚙️ C/O
+                </div>
+                <div class="block type-prod" style="left: 240px; width: 150px;" data-info="Embutido Pavo">Emb. Pavo
+                </div>
+                <div class="block type-prod" id="embutido-future" style="left: 390px; width: 200px;"
+                    data-info="Emb. SalchiJocho">Emb. SalchiJocho</div>
+            </div>
+        </div>
+
+        <div class="lane">
+            <div class="lane-label">Horno Fessman 1</div>
+            <div class="track" id="track-horno">
+                <div class="block type-prod" style="left: 150px; width: 150px;" data-info="Cocción Viena (55 min)">
+                    Cocción Viena</div>
+                <div class="block type-setup" style="left: 300px; width: 20px;" data-info="Cambio Ciclo">⚙️</div>
+                <div class="block type-prod" style="left: 320px; width: 150px;" data-info="Cocción Pavo">Cocción Pavo
+                </div>
+                <div class="block type-prod" id="horno-future" style="left: 470px; width: 200px;"
+                    data-info="Cocción SalchiJocho">Cocción SalchiJocho</div>
+            </div>
+        </div>
+
+        <div class="lane">
+            <div class="lane-label">Empaque (Línea 3)</div>
+            <div class="track" id="track-empaque">
+                <div class="block type-prod" style="left: 250px; width: 150px;" data-info="Empaque Viena">Empaque Viena
+                </div>
+                <div class="block type-setup" style="left: 400px; width: 50px;" data-info="Cambio Formato (45 min)">⚙️
+                    C/O Mayor</div>
+                <div class="block type-prod" id="empaque-future" style="left: 450px; width: 150px;"
+                    data-info="Empaque Pavo">Empaque Pavo</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="legend">
+        <div><span class="dot type-prod"></span>Producción Normal</div>
+        <div><span class="dot type-setup"></span>Tiempo de Cambio (Pérdida)</div>
+        <div><span class="dot type-urgent"></span>Urgencia (Rompe Plan)</div>
+    </div>
+
+    <script>
+        function injectUrgency() {
+            // IDs de los bloques futuros que se van a desplazar
+            const mezclaFuture = document.getElementById('mezcla-future');
+            const embutidoFuture = document.getElementById('embutido-future');
+            const hornoFuture = document.getElementById('horno-future');
+            const empaqueFuture = document.getElementById('empaque-future');
+
+            // 1. Desplazar bloques existentes (Push Effect)
+            mezclaFuture.style.left = "480px"; // Se mueve a la derecha
+            embutidoFuture.style.left = "540px";
+            hornoFuture.style.left = "620px";
+            empaqueFuture.style.left = "650px"; // Empuje masivo en empaque
+
+            // 2. Insertar el bloque de urgencia en los huecos creados
+            insertBlock('track-mezcla', 330, 150, 'URGENTE: Asar', true);
+
+            // Retraso visual para efecto cascada
+            setTimeout(() => insertBlock('track-embutido', 390, 150, 'URGENTE: Asar', true), 300);
+            setTimeout(() => insertBlock('track-horno', 470, 150, 'URGENTE: Asar', true), 600);
+
+            // Notar como el empaque sufre más por el cambio de formato
+            setTimeout(() => insertBlock('track-empaque', 500, 150, 'URGENTE: Asar', true), 900);
+
+            alert("⚠️ ALERTA: La inserción del pedido urgente ha desplazado la producción de 'SalchiJocho' por 2 horas. \n\nEsto visualiza el 'Efecto Látigo' mencionado por Producción.");
+        }
+
+        function insertBlock(trackId, left, width, text, isUrgent) {
+            const track = document.getElementById(trackId);
+            const div = document.createElement('div');
+            div.className = isUrgent ? 'block type-urgent' : 'block type-prod';
+            div.style.left = left + 'px';
+            div.style.width = width + 'px';
+            div.innerText = text;
+            div.dataset.info = "Pedido insertado por Ventas";
+
+            // Animación de entrada
+            div.style.opacity = 0;
+            track.appendChild(div);
+
+            setTimeout(() => {
+                div.style.opacity = 1;
+            }, 50);
+        }
+    </script>
+
+    <a href="index.html"
+        style="position: fixed; bottom: 20px; right: 20px; background-color: #00a3a1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 50px; font-family: sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 9999; font-weight: bold; font-size: 14px;">↩
+        Regresar</a>
+</body>
+
+</html>

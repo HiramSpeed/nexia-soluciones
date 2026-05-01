@@ -1,0 +1,8 @@
+Django
+Pillow
+django-widget-tweaks
+openpyxl
+weasyprint
+xhtml2pdf
+python-dotenv
+num2words

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexia | Impacto Ley 40h</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --nexia-green: #10b981;
+            --law-red: #ef4444;
+            --highlight: #3b82f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        /* --- DASHBOARD GRID --- */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-big {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--nexia-green);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- BARRA ACUMULADORA --- */
+        .bar-container {
+            width: 150px;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            border: 1px solid #334155;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            width: 100%;
+            height: 0%;
+            background: var(--nexia-green);
+            transition: height 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Marcador LEY 40H */
+        .limit-line {
+            position: absolute;
+            bottom: 59%;
+            /* 8h es el 59% de 13.5h aprox */
+            width: 100%;
+            border-bottom: 2px dashed var(--law-red);
+            z-index: 10;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .limit-tag {
+            background: var(--law-red);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transform: translateY(-50%);
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        /* --- CALENDARIO SEMANAL --- */
+        .week-grid {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .day-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background: #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #64748b;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .day-box.active {
+            background: var(--nexia-green);
+            color: #064e3b;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+
+        .floating-hours {
+            position: absolute;
+            top: -30px;
+            color: var(--nexia-green);
+            font-weight: bold;
+            font-size: 0.8rem;
+            animation: floatUp 1s forwards;
+        }
+
+        @keyframes floatUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        .btn-play {
+            background: var(--highlight);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .btn-play:hover {
+            transform: scale(1.05);
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--nexia-green);
+            color: #a7f3d0;
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #2ea4a3;
+            /* Teal similar to image */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            text-decoration: none;
+            z-index: 9999;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+
+        .floating-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(46, 164, 163, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>¿Cómo pagamos la Ley de 40 Horas?</h1>
+        <p>Análisis de impacto semanal: Ganancia Operativa Nexia vs. Reducción de Jornada Laboral.</p>
+
+        <div class="dashboard">
+
+            <div class="card">
+                <h3 style="margin-top:0;">Acumulado Semanal (6 Días)</h3>
+                <div class="week-grid">
+                    <div class="day-box" id="d1">L</div>
+                    <div class="day-box" id="d2">M</div>
+                    <div class="day-box" id="d3">M</div>
+                    <div class="day-box" id="d4">J</div>
+                    <div class="day-box" id="d5">V</div>
+                    <div class="day-box" id="d6">S</div>
+                </div>
+
+                <div class="stat-big" id="weekTotal">0.0 h</div>
+                <div class="stat-label">Capacidad Ganada / Semana</div>
+
+                <div style="margin-top:30px; font-size:0.9rem; color:#94a3b8;">
+                    <i class="fas fa-calculator"></i> 2.25h Diarias × 6 Días
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0;">Cobertura de Déficit</h3>
+
+                <div class="bar-container">
+                    <div class="limit-line">
+                        <div class="limit-tag">LEY 40H (-8h)</div>
+                    </div>
+
+                    <div class="bar-fill" id="fillBar"></div>
+                </div>
+
+                <div id="surplusBadge"
+                    style="margin-top:15px; background:var(--nexia-green); color:#064e3b; padding:5px 15px; border-radius:20px; font-weight:800; opacity:0; transform: scale(0.8); transition: all 0.5s;">
+                    SUPERÁVIT: +5.5h
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-play" onclick="runWeeklySim()">
+            <i class="fas fa-play"></i> Simular Semana Completa
+        </button>
+
+        <div id="finalMsg" class="result-box">
+            <i class="fas fa-check-circle"></i> <strong>Blindaje Operativo:</strong> El ahorro de Nexia (13.5h) cubre
+            totalmente el hueco de la reforma laboral (8h) y genera un bono de productividad de <strong>5.5 horas
+                extra</strong> a la semana.
+        </div>
+
+    </div>
+
+    <script>
+        function runWeeklySim() {
+            let day = 1;
+            let accum = 0;
+            const dailyGain = 2.25; // 2h 15m
+
+            // Reset
+            document.getElementById('weekTotal').innerText = "0.0 h";
+            document.getElementById('fillBar').style.height = "0%";
+            document.getElementById('surplusBadge').style.opacity = 0;
+            document.querySelectorAll('.day-box').forEach(b => {
+                b.className = 'day-box';
+                b.innerHTML = b.id.replace('d', '').replace('1', 'L').replace('2', 'M').replace('3', 'M').replace('4', 'J').replace('5', 'V').replace('6', 'S');
+            });
+
+            // Intervalo de animación
+            const interval = setInterval(() => {
+                if (day > 6) {
+                    clearInterval(interval);
+                    showFinalResult();
+                    return;
+                }
+
+                // Activar día
+                const box = document.getElementById('d' + day);
+                box.classList.add('active');
+
+                // Efecto flotante "+2.25"
+                const float = document.createElement('div');
+                float.className = 'floating-hours';
+                float.innerText = '+2.25h';
+                box.appendChild(float);
+
+                // Sumar
+                accum += dailyGain;
+
+                // Actualizar Texto
+                document.getElementById('weekTotal').innerText = accum.toFixed(1) + " h";
+
+                // Actualizar Barra (Max scale 15h visual)
+                const pct = (accum / 15) * 100;
+                document.getElementById('fillBar').style.height = pct + "%";
+
+                day++;
+
+            }, 400); // Velocidad por día
+        }
+
+        function showFinalResult() {
+            document.getElementById('surplusBadge').style.opacity = 1;
+            document.getElementById('surplusBadge').style.transform = 'scale(1)';
+            document.getElementById('finalMsg').style.opacity = 1;
+
+            // Efecto confetti o highlight en la barra
+            const bar = document.getElementById('fillBar');
+            bar.style.boxShadow = "0 0 50px rgba(16, 185, 129, 0.8)";
+        }
+    </script>
+
+    <button class="floating-btn" onclick="history.back()">
+        <i class="fas fa-undo"></i> Regresar
+    </button>
+</body>
+
+</html>

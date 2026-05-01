@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexia | Diagnóstico Operativo Profundo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- ESTILOS DEL DESGLOSE MATEMÁTICO --- */
+        .btn-link-math {
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .btn-link-math:hover {
+            opacity: 1;
+        }
+
+        .math-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-family: monospace;
+            /* Para que parezca ticket/factura */
+            font-size: 0.95rem;
+        }
+
+        .math-table td {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+        }
+
+        .math-table tr:last-child td {
+            border-bottom: none;
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding-top: 15px;
+        }
+
+        .math-row-highlight {
+            background: rgba(239, 68, 68, 0.1);
+            /* Fondo rojizo suave */
+        }
+
+        .math-value {
+            text-align: right;
+        }
+
+        /* --- ROADMAP STYLES --- */
+        .roadmap-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        .phase-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .phase-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            border-color: var(--primary);
+        }
+
+        .phase-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--border);
+        }
+
+        .phase-1:hover::before {
+            background: var(--success);
+        }
+
+        .phase-2:hover::before {
+            background: var(--primary);
+        }
+
+        .phase-3:hover::before {
+            background: var(--accent);
+        }
+
+        .phase-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        .phase-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .phase-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .click-hint {
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- MODAL (POP-UP) STYLES --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            /* Fondo oscuro borroso */
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            /* Oculto por defecto */
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            padding: 0;
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .activity-item:last-child {
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .check-icon {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* --- CALCULADORA PRO (Estilo V3) --- */
+        .calculator-panel {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-top: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .calc-display {
+            text-align: right;
+            border-left: 1px solid var(--border);
+            padding-left: 2rem;
+        }
+
+        .money-big {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--danger);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: #0b1120;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            color: white;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+        }
+
+        :root {
+            --bg-dark: #0f172a;
+            --bg-panel: #1e293b;
+            --primary: #3b82f6;
+            --accent: #06b6d4;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding-top: 80px;
+            overflow-x: hidden;
+        }
+
+        /* --- NAVIGATION --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand i {
+            color: var(--accent);
+        }
+
+        .nav-pills {
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .nav-pills button {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-pills button.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+        }
+
+        /* --- LAYOUT --- */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        /* --- VSM SECTION --- */
+        .vsm-container {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            overflow-x: auto;
+            padding-bottom: 2rem;
+            padding-top: 1rem;
+        }
+
+        .process-node {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            min-width: 240px;
+            padding: 1.5rem;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .process-node:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .process-node.critical {
+            border-left: 4px solid var(--danger);
+        }
+
+        .process-node.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .process-node.ok {
+            border-left: 4px solid var(--border);
+        }
+
+        .node-icon {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .node-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .node-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .kpi-badge {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        .kpi-badge span:last-child {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .arrow-connector {
+            align-self: center;
+            color: var(--border);
+            font-size: 1.2rem;
+            margin-top: -30px;
+            /* Adjust alignment */
+        }
+
+        /* --- SIDEBAR DETAILS --- */
+        .sidebar {
+            background: rgba(30, 41, 59, 0.8);
+            border-left: 1px solid var(--border);
+            height: calc(100vh - 70px);
+            position: fixed;
+            right: 0;
+            top: 70px;
+            width: 350px;
+            padding: 2rem;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .evidence-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .evidence-tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* --- CALCULATOR --- */
+        .calc-box {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .money-display {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--danger);
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+        }
+
+        /* --- ANIMATIONS --- */
+        .pulse-dot {
+            height: 10px;
+            width: 10px;
+            background-color: var(--danger);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+
+            70% {
+                opacity: 1;
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* --- BOTÓN DE ENLACE EXTERNO (ESTILO NEÓN) --- */
+        .btn-glow {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            /* Por si usamos etiqueta 'a' */
+            margin-top: 2rem;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.1);
+        }
+
+        .btn-glow:hover {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-glow i {
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="brand">
+            <i class="fas fa-cube"></i> NEXIA <span style="font-weight:300; color:white;">SOLUCIONES</span>
+        </div>
+        <div class="nav-pills">
+            <button class="active" onclick="switchView('vsm')">Mapa de Valor (VSM)</button>
+            <button onclick="switchView('roadmap')">Roadmap & ROI</button>
+        </div>
+    </nav>
+
+    <div id="vsm-view" class="container">
+
+        <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: end;">
+            <div>
+                <h1 style="font-size: 2rem; margin: 0;">Diagnóstico Operativo: <span style="color:var(--accent)">Línea
+                        Salchichas</span></h1>
+                <p style="color: var(--text-muted); margin-top: 5px;">Haz clic en cada etapa para ver la "Evidencia del
+                    Gemba".</p>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 0.9rem; color: var(--text-muted);">Eficiencia Global Aparente</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--warning);">~62% OEE</div>
+            </div>
+        </div>
+
+        <div class="vsm-container">
+            <div class="process-node warning" onclick="showDetails('formulacion')">
+                <div class="node-icon" style="color: var(--text-muted);"><i class="fas fa-vial"></i></div>
+                <div class="node-title">1. Salmueras</div>
+                <span class="node-subtitle">Formulación Manual</span>
+                <div class="kpi-badge"><span>Personal:</span> <span>3 Pax</span></div>
+                <div class="kpi-badge"><span>FIFO:</span> <span style="color:var(--warning)">No Visible</span></div>
+                <div class="kpi-badge"><span>Orden:</span> <span style="color:var(--danger)">Visual/Caótico</span></div>
+            </div>
+
+            <div class="arrow-connector"><i class="fas fa-chevron-right"></i></div>
+
+            <div class="process-node warning" onclick="showDetails('molienda')">
+                <div class="node-icon" style="color: var(--text-muted);"><i class="fas fa-blender"></i></div>
+                <div class="node-title">2. Mezclado</div>
+                <span class="node-subtitle">Molienda & Hidratado</span>
+                <div class="kpi-badge"><span>Dosificación:</span> <span style="color:var(--danger)">Manual/Ojo</span>
+                </div>
+                <div class="kpi-badge"><span>Flujo:</span> <span>Push / Radio</span></div>
+                <div class="kpi-badge"><span>Personal:</span> <span>3 Pax</span></div>
+            </div>
+
+            <div class="arrow-connector"><i class="fas fa-chevron-right"></i></div>
+
+            <div class="process-node warning" onclick="showDetails('hornos')">
+                <div class="node-icon" style="color: var(--warning);"><i class="fas fa-fire"></i></div>
+                <div class="node-title">3. Cocimiento</div>
+                <span class="node-subtitle">Hornos Fessman/Alkar</span>
+                <div class="kpi-badge"><span>OEE Fessman:</span> <span style="color:var(--warning)">67%</span></div>
+                <div class="kpi-badge"><span>Kg No Fab:</span> <span style="color:var(--danger)">-12,846 kg</span></div>
+                <div class="kpi-badge"><span>Eficiencia:</span> <span>Perdida x Flujo</span></div>
+            </div>
+
+            <div class="arrow-connector"><i class="fas fa-chevron-right"></i></div>
+
+            <div class="process-node critical" onclick="showDetails('empaque')">
+                <div class="node-icon" style="color: var(--danger);"><i class="fas fa-industry"></i></div>
+                <div class="node-title">4. Empaque</div>
+                <span class="node-subtitle"><span class="pulse-dot"></span>CUELLO DE BOTELLA</span>
+                <div class="kpi-badge"><span>Reempaque:</span> <span style="color:var(--danger)">2.91% ($1.3M)</span>
+                </div>
+                <div class="kpi-badge"><span>Conflicto:</span> <span>Granel vs Chico</span></div>
+                <div class="kpi-badge"><span>Config:</span> <span>7 Pel / 6 Emp</span></div>
+            </div>
+
+            <div class="arrow-connector"><i class="fas fa-chevron-right"></i></div>
+
+            <div class="process-node critical" onclick="showDetails('embalaje')">
+                <div class="node-icon" style="color: var(--accent);"><i class="fas fa-box-open"></i></div>
+                <div class="node-title">5. Embalaje</div>
+                <span class="node-subtitle">Cierre & Saneamiento</span>
+                <div class="kpi-badge"><span>Decomiso:</span> <span style="color:var(--danger)">1.24%</span></div>
+                <div class="kpi-badge"><span>Limpieza:</span> <span>30 Pax (3h/día)</span></div>
+                <div class="kpi-badge"><span>Cierre:</span> <span>Manual</span></div>
+            </div>
+        </div>
+
+        <h2 style="border-left: 4px solid var(--primary); padding-left: 1rem; margin-bottom: 1.5rem; margin-top: 3rem;">
+            Impacto Financiero</h2>
+        <div class="calculator-panel">
+            <div>
+                <h3 style="margin-top: 0; color: var(--text-main); font-size: 1.3rem;">Calculadora de Costo de
+                    No-Calidad</h3>
+                <p style="color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.95rem;">
+                    Ingrese el costo promedio por hora para visualizar el dinero "quemado" en limpieza (49,920 hrs/año).
+                </p>
+
+                <button class="btn-link-math" onclick="openMathModal()">
+                    <i class="fas fa-calculator"></i> ¿De dónde salen las 49k horas?
+                </button>
+
+                <div class="input-group" style="margin-top: 1.5rem;">
+                    <label>Costo Hora-Hombre (MXN)</label>
+                    <input type="number" id="hourlyRate" placeholder="Ej. 120" oninput="calculateImpact()">
+                </div>
+            </div>
+            <div class="calc-display">
+                <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Costo Anual Actual
+                    (Limpieza):</div>
+                <div class="money-big" id="annualLoss">$0.00</div>
+                <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px dashed var(--border);">
+                    <div style="font-size: 0.9rem; color: var(--success);">
+                        <i class="fas fa-arrow-up"></i> Ahorro Proyectado Nexia (Fase 1):
+                    </div>
+                    <div style="font-size: 2rem; font-weight: 700; color: var(--success);" id="nexiaSavings">$0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="sidebar" class="sidebar">
+            <button onclick="closeSidebar()"
+                style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; float:right;">&times;</button>
+            <h2 id="sb-title" style="margin-top:0; color:var(--primary);">Detalle</h2>
+            <p id="sb-desc" style="color:var(--text-muted); margin-bottom:2rem;">Selecciona una etapa.</p>
+            <div id="sb-content"></div>
+        </div>
+
+    </div>
+    <div id="roadmap-view" class="container hidden" style="padding-top: 2rem;">
+
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Plan de Transformación Nexia</h1>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+                Estrategia escalonada: De la Estabilidad a la Digitalización. <br>
+                Haz clic en cada fase para ver el plan de trabajo detallado.
+            </p>
+
+            <a href="vsm_capistrano.html" target="_blank" class="btn-glow">
+                <i class="fas fa-sitemap"></i> Ver VSM Técnico Detallado (Current State)
+            </a>
+        </div>
+
+        <div class="roadmap-grid">
+
+            <div class="phase-card phase-1" onclick="openModal('fase1')">
+                <span class="phase-badge" style="color: var(--success); border: 1px solid var(--success);">MES
+                    1-3</span>
+                <div class="phase-title">Estabilización Operativa</div>
+                <p class="phase-desc">Enfoque 100% Lean. Objetivo: Recuperar capacidad instalada y reducir el "sangrado"
+                    financiero de la limpieza.</p>
+                <div class="click-hint">Ver 4 Actividades Clave <i class="fas fa-arrow-right"></i></div>
+            </div>
+            <div class="phase-card phase-2" onclick="openModal('fase2')">
+                <span class="phase-badge" style="color: var(--primary); border: 1px solid var(--primary);">MES
+                    4-9</span>
+                <div class="phase-title">Sincronización del Flujo</div>
+                <p class="phase-desc">Alinear la velocidad del Horno con Empaque. Implementación de reglas de planeación
+                    y control visual.</p>
+                <div class="click-hint">Ver 3 Actividades Clave <i class="fas fa-arrow-right"></i></div>
+            </div>
+            <div class="phase-card phase-3" onclick="openModal('fase3')">
+                <span class="phase-badge" style="color: var(--accent); border: 1px solid var(--accent);">MES 9+</span>
+                <div class="phase-title">Digitalización (Industria 4.0)</div>
+                <p class="phase-desc">Eliminar la "Caja Negra". Captura automática de datos para toma de decisiones
+                    financiera en tiempo real.</p>
+                <div class="click-hint">Ver Stack Tecnológico <i class="fas fa-arrow-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div style="margin-top: 5rem; margin-bottom: 4rem; border-top: 1px dashed var(--border); padding-top: 3rem;">
+
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h1 style="font-size: 2.2rem; margin-bottom: 0.5rem;">Propuesta de Valor & Inversión</h1>
+            <p style="color: var(--text-muted);">Modelo de Acompañamiento Continuo vs. Consultoría Tradicional</p>
+        </div>
+
+        <div
+            style="margin-bottom: 4rem; overflow-x: auto; background: var(--bg-panel); border-radius: 12px; padding: 1rem; border: 1px solid var(--border);">
+            <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border);">
+                        <th style="text-align: left; padding: 1rem; color: var(--text-muted);">Variable</th>
+                        <th style="text-align: left; padding: 1rem; color: var(--text-muted);">Consultoría Tradicional
+                            <br><span style="font-size:0.8rem; opacity:0.7;">(Tipo Staufen / Shingijutsu)</span>
+                        </th>
+                        <th style="text-align: left; padding: 1rem; color: var(--accent); font-size: 1.2rem;">NEXIA
+                            SOLUCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 1.5rem 1rem; font-weight: 600;">Modelo de Servicio</td>
+                        <td style="padding: 1.5rem 1rem;">"Blitz" / Eventos de 1 Semana<br><small
+                                style="color: var(--text-muted);">Vienen, instruyen y se van.</small></td>
+                        <td style="padding: 1.5rem 1rem; color: var(--text-main); font-weight: 600;">Implantación
+                            Continua (Done-with-You)<br><small style="color: var(--accent);">Nos quedamos cada semana
+                                hasta lograr el KPI.</small></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 1.5rem 1rem; font-weight: 600;">Sostenibilidad</td>
+                        <td style="padding: 1.5rem 1rem;">Baja<br><small style="color: var(--text-muted);">Depende 100%
+                                de la disciplina del cliente al irse el consultor.</small></td>
+                        <td style="padding: 1.5rem 1rem; color: var(--text-main); font-weight: 600;">Garantizada por
+                            IA<br><small style="color: var(--accent);">Dejamos Apps y Agentes instalados que auditan el
+                                proceso.</small></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1.5rem 1rem; font-weight: 600;">Inversión</td>
+                        <td style="padding: 1.5rem 1rem;">$15k - $25k USD / Semana<br><small
+                                style="color: var(--text-muted);">Se paga por evento, sin garantía de ahorro.</small>
+                        </td>
+                        <td style="padding: 1.5rem 1rem; color: var(--success); font-weight: 600;">Retainer Mensual +
+                            Success Fee<br><small style="color: var(--success);">Solo ganamos si la planta gana.</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1.5rem 1rem; font-weight: 600;">Viáticos</td>
+                        <td style="padding: 1.5rem 1rem;">$5k - $15k USD / Evento<br><small
+                                style="color: var(--text-muted);">Se paga por evento, sin garantía de ahorro.</small>
+                        </td>
+                        <td style="padding: 1.5rem 1rem; color: var(--success); font-weight: 600;">NexIA es
+                            local<br><small style="color: var(--success);">Cero Viáticos (exepto si se ocupa
+                                apoyo)</small></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="roadmap-grid" style="align-items: flex-start;">
+
+            <div class="phase-card" style="border-color: var(--border); opacity: 0.8;">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <span class="phase-badge"
+                        style="background: rgba(255, 255, 255, 0.1); color: var(--text-muted);">EJECUCIÓN TÁCTICA</span>
+                    <h2 style="margin: 0.5rem 0; font-size: 2rem;">$150k <span
+                            style="font-size:1rem; color:var(--text-muted);">/mes</span></h2>
+                    <div style="font-size: 1rem; font-weight: 700; color: var(--text-muted);">+ Costo Tecnológico</div>
+                </div>
+                <ul class="activity-list" style="margin-bottom: 2rem;">
+                    <li class="activity-item" style="border:none; padding: 5px 0;"><i class="fas fa-check"
+                            style="color:var(--text-muted); margin-right:10px;"></i> 1 Consultor Jr. en Planta (Full
+                        Time)</li>
+                    <li class="activity-item" style="border:none; padding: 5px 0;"><i class="fas fa-check"
+                            style="color:var(--text-muted); margin-right:10px;"></i> Supervisión Sr. Quincenal</li>
+                    <li class="activity-item" style="border:none; padding: 5px 0;"><i class="fas fa-plus"
+                            style="color:var(--text-muted); margin-right:10px;"></i> Apps se cotizan por separado</li>
+                </ul>
+                <button class="btn-action"
+                    style="background: transparent; border: 1px solid var(--text-muted); color: var(--text-muted);">Seleccionar</button>
+            </div>
+
+            <div class="phase-card"
+                style="border: 2px solid var(--accent); transform: scale(1.05); box-shadow: 0 0 40px rgba(6,182,212,0.15); z-index: 10;">
+                <div
+                    style="position: absolute; top:0; right:0; background:var(--accent); color:black; font-weight:bold; padding:5px 15px; font-size:0.8rem; border-bottom-left-radius:10px;">
+                    MÁS ELEGIDO</div>
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <span class="phase-badge" style="background: rgba(6, 182, 212, 0.2); color: var(--accent);">SOCIO DE
+                        RIESGO</span>
+                    <h2 style="margin: 0.5rem 0; font-size: 2.5rem; color:white;">$190k <span
+                            style="font-size:1rem; color:var(--text-muted);">/mes</span></h2>
+                    <div style="font-size: 1.2rem; font-weight: 700; color: var(--success);">+ 15% del Ahorro Generado
+                    </div>
+                </div>
+                <p style="text-align: center; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                    Ideal para minimizar flujo de caja fijo y compartir el beneficio del éxito.
+                </p>
+                <ul class="activity-list" style="margin-bottom: 2rem;">
+                    <li class="activity-item" style="border:none; padding: 5px 0;"><i class="fas fa-check"
+                            style="color:var(--accent); margin-right:10px;"></i> 1 Consultor Sr. en Planta (3 días/sem)
+                    </li>
+                    <li class="activity-item" style="border:none; padding: 5px 0;"><i class="fas fa-check"
+                            style="color:var(--accent); margin-right:10px;"></i> Auditoría de Resultados Semanal</li>
+                    <li class="activity-item"
+                        style="border:none; padding: 5px 0; background:rgba(6,182,212,0.1); border-radius:8px; padding-left:10px;">
+                        <i class="fas fa-robot" style="color:var(--accent); margin-right:10px;"></i> <strong>Suite
+                            Tecnológica INCLUIDA</strong>
+                    </li>
+                </ul>
+                <button class="btn-action" style="background: var(--accent); color: white;">Elegir Recomendado</button>
+            </div>
+
+            <div class="phase-card" style="border-color: var(--primary);">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <span class="phase-badge" style="background: rgba(59, 130, 246, 0.2); color: var(--primary);">MODELO
+                        ESTÁNDAR</span>
+                    <h2 style="margin: 0.5rem 0; font-size: 2rem;">$300k <span
+                            style="font-size:1rem; color:var(--text-muted);">/mes</span></h2>
+                    <div style="font-size: 1rem; font-weight: 700; color: var(--success);">+ 7% del Ahorro</div>
+                </div>
+                <ul class="activity-list" style="margin-bottom: 2rem;">
+                    <li class="activity-item" style="border:none; padding: 5px 0;"><i class="fas fa-check"
+                            style="color:var(--primary); margin-right:10px;"></i> 2 Consultores Sr. en Planta (3
+                        días/sem)</li>
+                    <li class="activity-item" style="border:none; padding: 5px 0;"><i class="fas fa-check"
+                            style="color:var(--primary); margin-right:10px;"></i> Soporte Remoto 24/7</li>
+                    <li class="activity-item" style="border:none; padding: 5px 0;"><i class="fas fa-check"
+                            style="color:var(--primary); margin-right:10px;"></i> Licencia Apps Nexia (Incluida)</li>
+                </ul>
+                <button class="btn-action"
+                    style="background: transparent; border: 1px solid var(--primary); color: var(--primary);">Seleccionar</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <div id="m-badge" class="phase-badge" style="margin-bottom:5px;">FASE X</div>
+                    <h2 id="m-title" style="margin:0;">Título Fase</h2>
+                </div>
+                <button onclick="closeModal()"
+                    style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <ul id="m-list" class="activity-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* --- LÓGICA VSM CORREGIDA --- */
+
+        // 1. Definimos la data FUERA de la función para que no se cree cada vez que haces clic
+        const vsmData = {
+            formulacion: {
+                title: "1. Salmueras & Formulación",
+                subtitle: "Gestión Visual Inexistente",
+                content: `
+                <div class="evidence-tag">PROBLEMA</div>
+                <div style="font-size:0.95rem; color:var(--text-main); margin-bottom:15px;">
+                    El proceso inicia sin reglas claras. No hay FIFO sistémico, lo que provoca variabilidad desde el paso cero.
+                </div>
+                
+                <div style="display:flex; justify-content:space-between; margin-bottom:20px; text-align:center; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
+                    <div>
+                        <div style="font-size:1.1rem; font-weight:700; color:var(--warning)">Manual</div>
+                        <div style="font-size:0.7rem; color:var(--text-muted)">Carga</div>
+                    </div>
+                    <div>
+                        <div style="font-size:1.1rem; font-weight:700; color:var(--danger)">Caótico</div>
+                        <div style="font-size:0.7rem; color:var(--text-muted)">Orden</div>
+                    </div>
+                    <div>
+                        <div style="font-size:1.1rem; font-weight:700;">3 Pax</div>
+                        <div style="font-size:0.7rem; color:var(--text-muted)">Staff</div>
+                    </div>
+                </div>
+
+                <div class="evidence-card">
+                    <span class="evidence-tag">Evidencia Gemba</span>
+                    <div style="font-style:italic; color:#94a3b8;">
+                        "Esta área se ve bastante desordenada y no se entiende qué tarima sigue ya que no se ve un orden claro."
+                    </div>
+                </div>
+            `
+            },
+            molienda: {
+                title: "2. Mezclado & Molienda",
+                subtitle: "Dependencia Artesanal",
+                content: `
+                <div class="evidence-tag">PROBLEMA</div>
+                <div style="font-size:0.95rem; color:var(--text-main); margin-bottom:15px;">
+                    La calidad de la pasta depende 100% de la habilidad manual del operador para dosificar el agua "a ojo".
+                </div>
+
+                <div style="margin-bottom:20px;">
+                    <div style="font-size:2rem; font-weight:700; color:var(--warning)">Sin Estándar</div>
+                    <div style="font-size:0.8rem; color:var(--text-muted)">Riesgo alto de dañar el equipo.</div>
+                </div>
+
+                <div class="evidence-card">
+                    <span class="evidence-tag">Evidencia Transcripción</span>
+                    <div style="font-style:italic; color:#94a3b8;">
+                        "De forma manual tiene que verter el agua poco a poco, porque si la avienta toda de golpe, el molino se tapa."
+                    </div>
+                </div>
+            `
+            },
+            hornos: {
+                title: "3. Cocimiento (Hornos)",
+                subtitle: "Capacidad Subutilizada",
+                content: `
+                <div class="evidence-tag">ANÁLISIS DE CAPACIDAD</div>
+                <div style="font-size:0.95rem; color:var(--text-main); margin-bottom:15px;">
+                    Los hornos tienen capacidad sobrada, pero su eficiencia cae porque Empaque no desaloja a tiempo.
+                </div>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
+                    <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                        <div style="color:var(--text-muted); font-size:0.7rem;">OEE Fessman 2</div>
+                        <div style="font-size:1.4rem; font-weight:700; color:var(--warning)">67%</div>
+                    </div>
+                    <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
+                        <div style="color:var(--text-muted); font-size:0.7rem;">Kg Perdidos</div>
+                        <div style="font-size:1.4rem; font-weight:700; color:var(--danger)">12,846</div>
+                    </div>
+                </div>
+
+                <div class="evidence-card">
+                    <span class="evidence-tag">Dato Duro</span>
+                    <div style="font-style:italic; color:#94a3b8;">
+                        Se registraron 12,846 kg teóricos no fabricados debido a paros y falta de flujo continuo aguas abajo.
+                    </div>
+                </div>
+            `
+            },
+            empaque: {
+                title: "4. Empaque & Pelado",
+                subtitle: "EL CUELLO DE BOTELLA REAL",
+                content: `
+                <div class="evidence-tag" style="color:var(--danger)">CONFLICTO TÉCNICO</div>
+                <div style="font-size:0.95rem; color:var(--text-main); margin-bottom:20px;">
+                    Desbalance crítico: La línea no soporta la variabilidad entre formatos extremos (Granel vs. Paquete Chico).
+                </div>
+                
+                <div style="border-left:4px solid var(--danger); padding-left:15px; margin-bottom:20px;">
+                    <div style="font-size:2.5rem; font-weight:800; color:var(--danger)">2.91%</div>
+                    <div style="font-size:0.9rem; color:var(--text-muted)">Porcentaje de Reempaque</div>
+                    <div style="font-size:0.8rem; color:white; margin-top:5px;">Impacto: <strong>$1.3M MXN/año</strong></div>
+                </div>
+
+                <div class="evidence-card" style="border-color:var(--danger);">
+                    <span class="evidence-tag" style="color:var(--danger)">Causa Raíz</span>
+                    <div style="font-style:italic; color:#fca5a5;">
+                        "La bolsa 'Granel' es profunda y lenta de llenar; el 'Paquete Chico' es tan rápido que las peladoras no alcanzan a surtir."
+                    </div>
+                </div>
+            `
+            },
+            embalaje: {
+                title: "5. Embalaje & Saneamiento",
+                subtitle: "Mermas y Costos Ocultos",
+                content: `
+                <div class="evidence-tag">DESPERDICIO</div>
+                <div style="font-size:0.95rem; color:var(--text-main); margin-bottom:15px;">
+                    El final de la línea revela el costo masivo de mantener la planta limpia manualmente.
+                </div>
+                
+                <div style="margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="color:var(--danger); font-weight:700; font-size:1.5rem;">1.24%</span>
+                        <span style="color:var(--text-muted); font-size:0.9rem;">Decomiso (Merma)</span>
+                    </div>
+                </div>
+
+                <h4 style="color:white; margin:0 0 10px 0; font-size:1rem;">Limpieza (30 Personas)</h4>
+                <ul style="padding-left:20px; margin:0; color:var(--text-muted); font-size:0.9rem;">
+                    <li style="margin-bottom:5px;">Lunes-Sáb: <strong style="color:var(--warning)">3 Horas/día</strong></li>
+                    <li>Domingos: <strong style="color:var(--danger)">14 Horas (Full)</strong></li>
+                </ul>
+                
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:15px; text-align:right;">
+                    ~50,000 Horas Hombre anuales.
+                </div>
+            `
+            }
+        };
+
+        // 2. Esta es la función que tu HTML está llamando (showDetails)
+        function showDetails(key) {
+            const info = vsmData[key]; // Buscamos en el objeto de arriba
+
+            if (info) {
+                // Llenamos los huecos del HTML lateral
+                document.getElementById('sb-title').innerText = info.title;
+                document.getElementById('sb-desc').innerText = info.subtitle;
+                document.getElementById('sb-content').innerHTML = info.content;
+
+                // Mostramos el sidebar deslizando la clase .open
+                document.getElementById('sidebar').classList.add('open');
+            } else {
+                console.error("No se encontraron datos para: " + key);
+            }
+        }
+
+        // 3. Función para cerrar
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+
+
+        function openSidebar(key) {
+            const data = gembaData[key];
+            document.getElementById('sb-title').innerText = data.title;
+            document.getElementById('sb-desc').innerText = data.desc;
+            const contentDiv = document.getElementById('sb-content');
+            contentDiv.innerHTML = '';
+            data.evidence.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'evidence-card';
+                card.innerHTML = `<span class="evidence-tag">${item.tag}</span>${item.text}`;
+                contentDiv.appendChild(card);
+            });
+            document.getElementById('sidebar').classList.add('open');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        function calculateImpact() {
+            const rate = document.getElementById('hourlyRate').value;
+            const totalHours = 49920; // 30 personas * (18h semana + 14h domingo) * 52 semanas
+
+            if (rate) {
+                const total = rate * totalHours;
+                const savings = total * 0.33; // 33% Ahorro estimado
+                document.getElementById('annualLoss').innerText = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(total);
+                document.getElementById('nexiaSavings').innerText = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(savings);
+            }
+        }
+
+        // --- LÓGICA DE NAVEGACIÓN ---
+        function switchView(viewName) {
+            // Ocultar todo
+            document.getElementById('vsm-view').classList.add('hidden');
+            document.getElementById('roadmap-view').classList.add('hidden');
+
+            // Quitar clases activas botones
+            const btns = document.querySelectorAll('.nav-pills button');
+            btns.forEach(b => b.classList.remove('active'));
+
+            // Mostrar selección
+            if (viewName === 'vsm') {
+                document.getElementById('vsm-view').classList.remove('hidden');
+                btns[0].classList.add('active');
+            } else {
+                document.getElementById('roadmap-view').classList.remove('hidden');
+                btns[1].classList.add('active');
+            }
+        }
+
+        // --- LÓGICA ROADMAP MODAL ---
+        /* --- DATOS DEL ROADMAP (ENFOQUE HÍBRIDO: LEAN + IA) --- */
+        const roadmapData = {
+            fase1: {
+                badge: "MES 1-3 | ESTABILIZACIÓN",
+                title: "Taller SMED & Estándar",
+                activities: [
+                    {
+                        title: "Evento Kaizen: SMED en Saneamiento",
+                        desc: "Workshop intensivo de 3 días para convertir actividades internas en externas. Meta: Reducir setup de 3h a 2h."
+                    },
+                    {
+                        title: "Despliegue de 5S + Gestión Visual",
+                        desc: "Estandarización de estaciones de limpieza y carritos de herramientas (Shadow Boards)."
+                    },
+                    {
+                        title: "Digitalización de Documentos",
+                        desc: "Digitalización de documentos para mejorar la trazabilidad y reducir el uso de papel."
+                    },
+                    {
+                        title: "🤖 NEXIA TECH (El Candado): App 'CleanCheck'",
+                        desc: "Trazabilidad Digital: El operador oprime un botón (y/o toma foto) al iniciar y terminar cada etapa. Esto permite cronometrar la duración real de cada paso y detectar cuellos de botella."
+                    }
+                ]
+            },
+            fase2: {
+                badge: "MES  3-9| FLOW & PULL",
+                title: "Heijunka & Sistema Pull",
+                activities: [
+                    {
+                        title: "Evento Kaizen: SMED Cambios de Producto",
+                        desc: "Workshop intensivo de 3 días para convertir actividades internas en externas. Meta: Reducir setup en un 30%."
+                    },
+                    {
+                        title: "Nivelación (Heijunka Box)",
+                        desc: "Secuenciación lógica de la producción (Rueda de Ciclos) para minimizar cambios de formato en Empaque."
+                    },
+                    {
+                        title: "🤖 NEXIA TECH: Agente 'Mr. Planner'",
+                        desc: "Asistente IA conectado a WhatsApp/Web. El planeador le pregunta: '¿Cuál es la secuencia óptima para hoy?' y el Agente responde priorizando la eficiencia del cuello de botella."
+                    }
+                ]
+            },
+            fase3: {
+                badge: "MES 9+ | CULTURA & DATOS",
+                title: "Excelencia Operacional 4.0",
+                activities: [
+                    {
+                        title: "Leader Standard Work (LSW)",
+                        desc: "Rutinas de supervisión escalonada para asegurar la disciplina operativa en los nuevos estándares."
+                    },
+                    {
+                        title: "Gemba Walks Digitales",
+                        desc: "Caminatas de gerencia enfocadas en verificar la adherencia al sistema digital."
+                    },
+                    {
+                        title: "🤖 NEXIA TECH: El Guardián (LLM)",
+                        desc: "Entrega final del LLM entrenado con los datos históricos de la planta. Detecta tendencias de micro-paros invisibles y sugiere acciones preventivas al Gerente de Planta cada mañana."
+                    }
+                ]
+            }
+        };
+
+        /* --- LÓGICA DEL MODAL (ACTUALIZADA PARA RESALTAR LA IA) --- */
+        function openModal(phaseKey) {
+            const data = roadmapData[phaseKey];
+            const overlay = document.getElementById('modalOverlay');
+
+            // Llenar Textos Principales
+            document.getElementById('m-badge').innerText = data.badge;
+            document.getElementById('m-title').innerText = data.title;
+
+            const list = document.getElementById('m-list');
+            list.innerHTML = ''; // Limpiar lista anterior
+
+            data.activities.forEach(act => {
+                const item = document.createElement('li');
+                item.className = 'activity-item';
+
+                // Detectar si es el ítem tecnológico para darle estilo especial
+                const isTech = act.title.includes("🤖");
+
+                // Icono: Robot si es Tech, Check si es Lean
+                const iconHtml = isTech
+                    ? `<div class="check-icon" style="background: rgba(6, 182, 212, 0.2); color: var(--accent);"><i class="fas fa-robot"></i></div>`
+                    : `<div class="check-icon"><i class="fas fa-check"></i></div>`;
+
+                // Estilo de texto: Azul brillante si es Tech
+                const titleStyle = isTech
+                    ? `color: var(--accent); text-shadow: 0 0 10px rgba(6,182,212,0.3);`
+                    : `color: var(--text-main);`;
+
+                item.innerHTML = `
+            ${iconHtml}
+            <div>
+                <strong style="display:block; margin-bottom:4px; ${titleStyle}">${act.title}</strong>
+                <span style="color:var(--text-muted); font-size:0.9rem;">${act.desc}</span>
+            </div>
+        `;
+                list.appendChild(item);
+            });
+
+            // Mostrar Modal
+            overlay.classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (event && event.target.closest('.modal-content')) return;
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+
+    </script>
+    <div id="mathModal" class="modal-overlay" onclick="closeMathModal(event)">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 style="margin:0;">🧮 Desglose de Horas</h3>
+                <button onclick="closeMathModal()"
+                    style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;">
+                    Cálculo basado en la plantilla actual de 30 personas asignadas a tareas de saneamiento.
+                </p>
+
+                <table class="math-table">
+                    <tr>
+                        <td>Personal Asignado</td>
+                        <td class="math-value">30 pax</td>
+                    </tr>
+                    <tr>
+                        <td>Lunes a Sábado (3h x 6 días)</td>
+                        <td class="math-value">18 hrs/pax</td>
+                    </tr>
+                    <tr class="math-row-highlight">
+                        <td>Domingo (Limpieza Profunda)</td>
+                        <td class="math-value">14 hrs/pax</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Semanal por Persona</strong></td>
+                        <td class="math-value">32 hrs</td>
+                    </tr>
+                    <tr>
+                        <td>Total Horas Planta (Semanal)<br><small>(30 pax * 32 hrs)</small></td>
+                        <td class="math-value">960 hrs</td>
+                    </tr>
+                    <tr>
+                        <td>Semanas al Año</td>
+                        <td class="math-value">x 52</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TOTAL ANUAL PERDIDO</strong></td>
+                        <td class="math-value" style="color: var(--danger);">49,920 hrs</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Agrega estas funciones al final de tu script actual
+        function openMathModal() {
+            document.getElementById('mathModal').classList.add('active');
+        }
+
+        function closeMathModal(event) {
+            if (event && event.target.closest('.modal-content')) return; // Evita cerrar si clic dentro
+            document.getElementById('mathModal').classList.remove('active');
+        }
+    </script>
+    <a href="index.html"
+        style="position: fixed; bottom: 20px; right: 20px; background-color: #00a3a1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 50px; font-family: sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 9999; font-weight: bold; font-size: 14px;">↩
+        Regresar</a>
+</body>
+
+</html>

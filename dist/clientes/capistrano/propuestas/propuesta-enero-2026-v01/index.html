@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capistrano - Propuesta Enero 2026</title>
+    <style>
+        :root {
+            --nexia-blue: #003366;
+            --nexia-teal: #00a3a1;
+            --bg-color: #0d1117;
+            --text-color: #ffffff;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--nexia-blue);
+            color: white;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+
+        .breadcrumb {
+            background-color: #161b22;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            text-align: center;
+            color: #a0a0a0;
+        }
+
+        .breadcrumb a {
+            color: var(--nexia-teal);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            /* Slightly thinner */
+            background-color: var(--border-color);
+            /* Subtle default */
+            transition: height 0.3s ease, background-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            /* Dark shadow */
+            border-color: var(--nexia-teal);
+        }
+
+        .card:hover::before {
+            height: 100%;
+            opacity: 0.1;
+            /* Slightly more visible on dark */
+            background-color: var(--nexia-teal);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--nexia-blue);
+        }
+
+        .card h2 {
+            margin: 0.5rem 0;
+            font-size: 1.25rem;
+            color: var(--nexia-teal);
+        }
+
+        .card p {
+            color: #8b949e;
+            font-size: 0.95rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: #999;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Capistrano - Proyecto Operativo 2026</h1>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="../../../../index.html">Control Center</a> &gt; Capistrano V1
+    </div>
+
+    <main>
+        <div class="grid-container">
+            <!-- Tarjeta 1 -->
+            <a href="./Diagnostico_capistrano5.html" class="card">
+                <div class="card-icon">📊</div>
+                <h2>Diagnóstico Operativo</h2>
+                <p>Análisis profundo del estado actual de las operaciones.</p>
+            </a>
+
+            <!-- Tarjeta 2 -->
+            <a href="./vsm_capistrano.html" class="card">
+                <div class="card-icon">🔄</div>
+                <h2>Modelo VSM</h2>
+                <p>Value Stream Mapping y visualización de flujos.</p>
+            </a>
+
+            <!-- Tarjeta 3 -->
+            <a href="./swot_capistrano.html" class="card">
+                <div class="card-icon">🎯</div>
+                <h2>Análisis SWOT</h2>
+                <p>Fortalezas, Oportunidades, Debilidades y Amenazas.</p>
+            </a>
+
+            <!-- Tarjeta 4 -->
+            <a href="./Gantt_Dinamico_Scheduler.html" class="card">
+                <div class="card-icon">📅</div>
+                <h2>Visualizador de Flujo & Cambios</h2>
+                <p>Visualiza el impacto de los cambios (Changeovers) en la Línea de Salchichas.</p>
+            </a>
+
+            <!-- Tarjeta 5 -->
+            <a href="./SMED_Capistrano.html" class="card">
+                <div class="card-icon">⏱️</div>
+                <h2>SMED Timeline Simulación</h2>
+                <p>Análisis de Recuperación de Capacidad (SMED). Línea Salchichas</p>
+            </a>
+
+            <!-- Tarjeta 6 -->
+            <a href="./Propuesta_app.html" class="card">
+                <div class="card-icon">📱</div>
+                <h2>NexIA App - Prototipo</h2>
+                <p>Línea Salchichas | Tiempo Real</p>
+            </a>
+
+            <!-- Tarjeta 7 -->
+            <a href="./SMED_Capistranov10.html" class="card">
+                <div class="card-icon">⏰</div>
+                <h2>Impacto Ley 40 Horas</h2>
+                <p>Análisis de impacto semanal: Ganancia Operativa Nexia vs. Reducción de Jornada Laboral.</p>
+            </a>
+
+            <!-- Tarjeta 8 -->
+            <a href="./propuesta_Caspitrano.html" class="card">
+                <div class="card-icon">🚀</div>
+                <h2>Propuesta Transformación Lean & Digital</h2>
+                <p>Roadmap 18 Meses. Una estrategia escalonada para financiar el crecimiento con los ahorros generados.
+                </p>
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 NexIA Soluciones - Documentación Confidencial <!-- v1.1 -->
+    </footer>
+
+    <a href="/clientes/index.html"
+        style="position: fixed; bottom: 20px; right: 20px; background-color: #00a3a1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 50px; font-family: sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 9999; font-weight: bold; font-size: 14px;">↩
+        Volver al Control Center</a>
+</body>
+
+</html>

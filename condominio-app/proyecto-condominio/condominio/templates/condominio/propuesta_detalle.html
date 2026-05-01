@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ propuesta.titulo }}</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+        .main-container { max-width: 800px; margin: auto; }
+        .propuesta-detalle { background-color: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 30px; }
+        .propuesta-header h1 { margin-top: 0; }
+        .meta-info { color: #6c757d; margin-bottom: 20px; }
+        .section { margin-top: 25px; }
+        .section h3 { border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .votacion-box { margin-top: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .votacion-box button { width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 10px; }
+        .btn-favor { background-color: #28a745; color: white; }
+        .btn-contra { background-color: #dc3545; color: white; }
+        .btn-abstencion { background-color: #6c757d; color: white; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        {% include 'condominio/_header_villa.html' %}
+
+        <div class="propuesta-detalle">
+            <div class="propuesta-header">
+                <h1>{{ propuesta.titulo }}</h1>
+                <p class="meta-info">
+                    Propuesto por: <strong>Casa {{ propuesta.autor.numero_casa }}</strong> |
+                    Estado: <strong>{{ propuesta.get_estado_display }}</strong> |
+                    Votación finaliza: <strong>{{ propuesta.fecha_fin_votacion|date:"d M, Y" }}</strong>
+                </p>
+            </div>
+
+            <div class="section">
+                <h3>Descripción</h3>
+                <p>{{ propuesta.descripcion|linebreaks }}</p>
+            </div>
+
+            <div class="section">
+                <h3>Beneficios para la Comunidad</h3>
+                <p>{{ propuesta.beneficios|linebreaks }}</p>
+            </div>
+
+            <div class="section">
+                <h3>Costo Estimado</h3>
+                <p>${{ propuesta.costo_estimado }}</p>
+            </div>
+
+            <div class="section">
+                <h3>Documentos Adjuntos</h3>
+                {% if propuesta.documentos.all %}
+                    <ul>
+                        {% for doc in propuesta.documentos.all %}
+                            <li>
+                                <a href="{{ doc.documento.url }}" target="_blank">{{ doc.nombre_documento }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No hay documentos adjuntos para esta propuesta.</p>
+                {% endif %}
+            </div>
+
+            <div class="votacion-box">
+                {% if puede_votar %}
+                    <h3>Emite tu Voto</h3>
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" name="decision" value="A Favor" class="btn-favor">✅ A Favor</button>
+                        <button type="submit" name="decision" value="En Contra" class="btn-contra">❌ En Contra</button>
+                        <button type="submit" name="decision" value="Abstencion" class="btn-abstencion">➖ Abstención</button>
+                    </form>
+                {% elif voto_usuario %}
+                    <h3>Tu Voto Ha Sido Registrado</h3>
+                    <p>Tu decisión fue: <strong>{{ voto_usuario.get_decision_display }}</strong></p>
+                {% else %}
+                    <h3>Votación Cerrada</h3>
+                    <p>El periodo para votar en esta propuesta ha finalizado.</p>
+                {% endif %}
+
+                <div class="section">
+                    <h4>Resultados Actuales:</h4>
+                    <p>
+                        <strong>A Favor:</strong> {{ resultados.a_favor }} |
+                        <strong>En Contra:</strong> {{ resultados.en_contra }} |
+                        <strong>Abstenciones:</strong> {{ resultados.abstencion }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <a href="{% url 'condominio:propuestas_lista' %}" style="margin-top: 20px; display: inline-block;">&larr; Volver a la Lista de Propuestas</a>
+    </div>
+</body>
+</html>

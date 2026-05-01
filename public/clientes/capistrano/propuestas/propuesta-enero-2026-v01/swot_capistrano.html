@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexia | Diagnóstico Ejecutivo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #3b82f6;
+            /* Fortalezas */
+            --danger: #ef4444;
+            /* Amenazas */
+            --warning: #f59e0b;
+            /* Debilidades */
+            --success: #10b981;
+            /* Oportunidades */
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- NAVBAR (Consistente con VSM) --- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            box-sizing: border-box;
+        }
+
+        .brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand span {
+            font-weight: 300;
+            color: #06b6d4;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: 120px 2rem 60px 2rem;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            background: linear-gradient(to right, white, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .highlight-box {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid #06b6d4;
+            color: #06b6d4;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            animation: fadeIn Down 1s ease;
+        }
+
+        /* --- SWOT GRID (BENTO STYLE) --- */
+        .swot-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem 2rem;
+        }
+
+        .swot-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: default;
+            overflow: hidden;
+        }
+
+        /* Interacción de Focus */
+        .swot-container:hover .swot-card {
+            opacity: 0.5;
+            filter: blur(2px);
+            transform: scale(0.98);
+        }
+
+        .swot-container .swot-card:hover {
+            opacity: 1;
+            filter: blur(0);
+            transform: scale(1.02);
+            z-index: 10;
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Colores Específicos */
+        .s-card .icon-box {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--primary);
+        }
+
+        .s-card {
+            border-top: 4px solid var(--primary);
+        }
+
+        .w-card .icon-box {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .w-card {
+            border-top: 4px solid var(--warning);
+        }
+
+        .o-card .icon-box {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .o-card {
+            border-top: 4px solid var(--success);
+        }
+
+        .t-card .icon-box {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .t-card {
+            border-top: 4px solid var(--danger);
+        }
+
+        /* Lista de Items */
+        .swot-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .swot-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 1.2rem;
+            opacity: 0;
+            /* Para animación */
+            transform: translateY(10px);
+            animation: fadeInUp 0.5s forwards;
+        }
+
+        .swot-item i {
+            margin-top: 4px;
+            font-size: 0.9rem;
+        }
+
+        .item-title {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-main);
+        }
+
+        .item-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Delay loop para animación */
+        .swot-item:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .swot-item:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .swot-item:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .swot-item:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* CTA FINAL */
+        .cta-container {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px dashed var(--border);
+            margin-top: 2rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .swot-container {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="brand">
+            <i class="fas fa-project-diagram"></i> NEXIA <span>CONSULTING</span>
+        </div>
+        <div style="color: var(--text-muted); font-size: 0.9rem;">
+            Cliente: <strong>Grupo Capistrano</strong>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="highlight-box">DIAGNÓSTICO ESTRATÉGICO 2026</div>
+        <h1>La Paradoja de Capistrano:<br>Infraestructura de 1er Nivel, Gestión Manual</h1>
+        <p>Aunque la planta cuenta con tecnología de clase mundial (Fessman/Alkar), la gestión basada en papel y
+            WhatsApp amenaza la capacidad de absorber el crecimiento proyectado.</p>
+    </div>
+
+    <div class="swot-container">
+
+        <div class="swot-card s-card">
+            <div class="card-header">
+                <div class="card-title">Fortalezas <span
+                        style="font-size:0.9rem; font-weight:400; color:var(--text-muted); margin-left:10px;">(Interno)</span>
+                </div>
+                <div class="icon-box"><i class="fas fa-dumbbell"></i></div>
+            </div>
+            <ul class="swot-list">
+                <li class="swot-item">
+                    <i class="fas fa-check-circle" style="color:var(--primary)"></i>
+                    <div>
+                        <span class="item-title">Equipamiento Clase Mundial</span>
+                        <span class="item-desc">Maquinaria de alta gama (Hornos/Empaque) con capacidad nominal
+                            suficiente.</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-check-circle" style="color:var(--primary)"></i>
+                    <div>
+                        <span class="item-title">Alta Demanda (Vendido)</span>
+                        <span class="item-desc">El problema no es ventas, es capacidad. La planta vende todo lo que
+                            produce.</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-check-circle" style="color:var(--primary)"></i>
+                    <div>
+                        <span class="item-title">Apertura al Cambio</span>
+                        <span class="item-desc">Gerencia consciente de la "ceguera de taller" y dispuesta a adoptar
+                            herramientas digitales.</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-check-circle" style="color:var(--primary)"></i>
+                    <div>
+                        <span class="item-title">Know-How Tribal</span>
+                        <span class="item-desc">Operadores con conocimiento técnico profundo del producto (aunque no
+                            documentado).</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="swot-card w-card">
+            <div class="card-header">
+                <div class="card-title">Debilidades <span
+                        style="font-size:0.9rem; font-weight:400; color:var(--text-muted); margin-left:10px;">(Interno)</span>
+                </div>
+                <div class="icon-box"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+            <ul class="swot-list">
+                <li class="swot-item">
+                    <i class="fas fa-circle" style="color:var(--warning)"></i>
+                    <div>
+                        <span class="item-title">Desconexión Plan-Ejecución</span>
+                        <span class="item-desc">Programa liberado a las 5:00 PM con cambios constantes. Genera "Efecto
+                            Látigo".</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-circle" style="color:var(--warning)"></i>
+                    <div>
+                        <span class="item-title">"Agujero Negro" de Datos</span>
+                        <span class="item-desc">Gestión en papel y WhatsApp. JD Edwards es financiero, no ve la realidad
+                            del piso.</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-circle" style="color:var(--warning)"></i>
+                    <div>
+                        <span class="item-title">Mantenimiento Reactivo</span>
+                        <span class="item-desc">Con historial real de fallas en excel (Causa Raíz desconocida).</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-circle" style="color:var(--warning)"></i>
+                    <div>
+                        <span class="item-title">Pérdida por Higiene</span>
+                        <span class="item-desc">Limpieza extendida de 8 a 14 horas, consumiendo turnos productivos
+                            valiosos.</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="swot-card o-card">
+            <div class="card-header">
+                <div class="card-title">Oportunidades <span
+                        style="font-size:0.9rem; font-weight:400; color:var(--text-muted); margin-left:10px;">(Externo)</span>
+                </div>
+                <div class="icon-box"><i class="fas fa-rocket"></i></div>
+            </div>
+            <ul class="swot-list">
+                <li class="swot-item">
+                    <i class="fas fa-plus-circle" style="color:var(--success)"></i>
+                    <div>
+                        <span class="item-title">Recuperación SMED</span>
+                        <span class="item-desc">Optimizar limpieza podría liberar +15% de capacidad sin comprar más
+                            máquinas.</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-plus-circle" style="color:var(--success)"></i>
+
+                    <div>
+                        <span class="item-title">Digitalización "Low-Code"</span>
+                        <span class="item-desc">Implementación de Apps ágiles para eliminar la "ceguera" en menos de 3
+                            meses.</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-plus-circle" style="color:var(--success)"></i>
+                    <div>
+                        <span class="item-title">La "Fábrica Oculta"</span>
+                        <span class="item-desc">Conectar los PLCs aislados revelará el OEE real y los micro-paros al
+                            instante.</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-plus-circle" style="color:var(--success)"></i>
+                    <div>
+                        <span class="item-title">Frozen Zone (Estabilización)</span>
+                        <span class="item-desc">Congelar programa 72h permitiría secuencias lógicas y reducción drástica
+                            de cambios.</span>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="swot-card t-card">
+            <div class="card-header">
+                <div class="card-title">Amenazas <span
+                        style="font-size:0.9rem; font-weight:400; color:var(--text-muted); margin-left:10px;">(Externo)</span>
+                </div>
+                <div class="icon-box"><i class="fas fa-radiation"></i></div>
+            </div>
+            <ul class="swot-list">
+                <li class="swot-item">
+                    <i class="fas fa-times-circle" style="color:var(--danger)"></i>
+                    <div>
+                        <span class="item-title">Legislación Laboral (40h)</span>
+                        <span class="item-desc">Insostenible con los niveles actuales de eficiencia y dependencia de
+                            tiempo extra.</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-times-circle" style="color:var(--danger)"></i>
+                    <div>
+                        <span class="item-title">Explosión de SKUs</span>
+                        <span class="item-desc">Mercado exige más variedad (Paquete vs Granel), lo que destrozará el OEE
+                            sin estandarización.</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-times-circle" style="color:var(--danger)"></i>
+                    <div>
+                        <span class="item-title">Dependencia Tribal</span>
+                        <span class="item-desc">Rotación en puestos clave (Molinero) pone en riesgo la operación al no
+                            haber estándar digital.</span>
+                    </div>
+                </li>
+                <li class="swot-item">
+                    <i class="fas fa-times-circle" style="color:var(--danger)"></i>
+                    <div>
+                        <span class="item-title">Obsolescencia Silenciosa</span>
+                        <span class="item-desc">Operar máquinas modernas con métodos manuales subutiliza el CAPEX ya
+                            realizado.</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+
+    <div class="cta-container">
+        <p style="color:var(--text-muted); margin-bottom:20px;">Basado en este diagnóstico, hemos trazado la ruta
+            crítica.</p>
+        <a href="vsm_capistrano.html" class="btn-primary">Ver Mapa de Valor (VSM) <i class="fas fa-arrow-right"
+                style="margin-left:10px;"></i></a>
+    </div>
+
+    <a href="index.html"
+        style="position: fixed; bottom: 20px; right: 20px; background-color: #00a3a1; color: white; padding: 10px 20px; text-decoration: none; border-radius: 50px; font-family: sans-serif; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 9999; font-weight: bold; font-size: 14px;">↩
+        Regresar</a>
+</body>
+
+</html>

@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Villa Catania{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Nexia Theme -->
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    
+    <style>
+        /* Minimal layout overrides if needed, most is in theme.css */
+        .main-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-grow: 1;
+            padding: 20px;
+        }
+        
+        .footer {
+            width: 100%;
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 14px;
+            color: var(--secondary-text-color);
+        }
+        
+        .footer .btn-donar {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="main-container">
+        {% include 'condominio/_header_villa.html' %}
+        
+        {% if messages %}
+            <div class="messages-container" style="list-style-type: none; padding: 0; margin: 20px 0;">
+                {% for message in messages %}
+                    <p style="padding: 15px; border-radius: 5px; color: white; text-align: center; font-weight: bold; background-color: {% if message.tags == 'success' %}#28a745{% elif message.tags == 'warning' %}#ffc107{% else %}#dc3545{% endif %};">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <footer class="footer">
+        <p>Este proyecto es patrocinado como proyecto comunitario por parte de <strong>lvb.org</strong></p>
+        <a href="#" class="btn-donar">Hacer una Donación</a>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

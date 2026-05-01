@@ -1,0 +1,77 @@
+{% load static %}
+{% if villa_actual %}
+<style>
+    .villa-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: var(--card-background);
+        /* Dark mode */
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .villa-header img.logo {
+        height: 50px;
+        width: auto;
+    }
+
+    .villa-info {
+        text-align: center;
+    }
+
+    .villa-info h1 {
+        margin: 0;
+        font-size: 24px;
+        color: var(--primary-color);
+        /* Nexia Blue */
+    }
+
+    .villa-info p {
+        margin: 5px 0 0 0;
+        color: var(--secondary-text-color);
+    }
+
+    .nexia-branding {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 10px;
+        color: var(--secondary-text-color);
+        opacity: 0.7;
+    }
+
+    .nexia-branding img {
+        height: 30px;
+        margin-bottom: 2px;
+    }
+</style>
+
+<header class="villa-header">
+    {% if villa_actual.logo %}
+    <img src="{{ villa_actual.logo.url }}" alt="Logo Izquierdo" class="logo">
+    {% else %}
+    <!-- Placeholder if no condo logo -->
+    <div style="width: 50px;"></div>
+    {% endif %}
+
+    <div class="villa-info">
+        <h1>{{ villa_actual.nombre }}</h1>
+        <p>
+            {{ villa_actual.direccion }}
+            {% if villa_actual.google_maps_link %}
+            - <a href="{{ villa_actual.google_maps_link }}" target="_blank">Ver en Mapa</a>
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Nexia Branding (Right side) -->
+    <div class="nexia-branding">
+        <span style="margin-bottom: 5px;">Powered by</span>
+        <img src="{% static 'nexia-logo.png' %}" alt="NexIA">
+    </div>
+</header>
+{% endif %}

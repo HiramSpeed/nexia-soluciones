@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp *)",
+      "Read(//home/dhira/.claude/**)",
+      "Bash(curl -s https://n8n.nexiasoluciones.com.mx/api/v1/workflows -H \"X-N8N-API-KEY: $\\(grep N8N_API_KEY ~/.claude/settings.json)",
+      "Bash(curl -s \"https://n8n.nexiasoluciones.com.mx/api/v1/workflows?limit=100\" -H \"X-N8N-API-KEY: $\\(grep N8N_API_KEY ~/.claude/settings.json)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); wfs=d.get\\('data',[]\\); print\\(f'Total: {len\\(wfs\\)}'\\); [print\\(f'  [{\\\\\"✓\\\\\" if w[\\\\\"active\\\\\"] else \\\\\" \\\\\"}] {w[\\\\\"name\\\\\"]} \\(id: {w[\\\\\"id\\\\\"]}, archivado: {w.get\\(\\\\\"isArchived\\\\\",False\\)}\\)'\\) for w in wfs]\")",
+      "Bash(curl -s -X POST https://n8n.nexiasoluciones.com.mx/api/v1/workflows -H 'X-N8N-API-KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MGQ1MzNmMi03NzE3LTQyNmYtOWM0NC00OWQ3NmNkNGI2NzgiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzc0ODkxMTM2fQ.4sCprTsuVBZYDWBn9MN4CzWH9NXGby1ZwpMeLGuTPCA' -H 'Content-Type: application/json' -d '{ *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('ID:', d.get\\('id','ERROR'\\)\\); print\\('Name:', d.get\\('name','?'\\)\\); print\\('Error:', d.get\\('message','ninguno'\\)\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl *)",
+      "Bash(git -C /home/dhira/dev/nexia-soluciones checkout -b feature/scroll-continuo)",
+      "Bash(git -C /home/dhira/dev/nexia-soluciones branch)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git -C /home/dhira/dev/nexia-soluciones log --oneline -3)",
+      "Bash(git -C /home/dhira/dev/nexia-soluciones status)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('ID:', d.get\\('id','?'\\), '| Nombre:', d.get\\('name','?'\\), '| Error:', d.get\\('message','ninguno'\\)\\)\")",
+      "Bash(python3 -c \" import sys,json d=json.load\\(sys.stdin\\) for n in d['nodes']: if n['name']=='Formatear Datos': print\\(n['parameters']['jsCode']\\) \")",
+      "Bash(python3 -c \" import sys,json d=json.load\\(sys.stdin\\) for n in d['nodes']: if n['name']=='Preparar Datos': print\\(n['parameters']['jsCode']\\) \")",
+      "Bash(python3 *)",
+      "Bash(git -C ~/dev/nexia-tools add Workflow.md)",
+      "Bash(git -C ~/dev/nexia-tools commit -m \"docs: agregar protocolo de gestión de contexto /compact y /clear\")",
+      "Bash(git -C ~/dev/nexia-tools push)",
+      "Bash(npm run *)"
+    ]
+  }
+}

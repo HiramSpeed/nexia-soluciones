@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexia | Roadmap Estratégico 2026-2027</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-panel: #1e293b;
+            --primary: #3b82f6;
+            /* Fase 1 */
+            --accent: #06b6d4;
+            /* Fase 2 */
+            --purple: #8b5cf6;
+            /* Fase 3 */
+            --gold: #f59e0b;
+            /* Fase 4 */
+            --success: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            padding: 40px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0;
+        }
+
+        /* --- HEADER --- */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* --- TIMELINE VERTICAL --- */
+        .timeline {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        /* Línea central */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            background: #334155;
+            margin-left: -2px;
+            border-radius: 2px;
+        }
+
+        .phase-container {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+            box-sizing: border-box;
+        }
+
+        .left {
+            left: 0;
+        }
+
+        .right {
+            left: 50%;
+        }
+
+        /* Círculos de conexión */
+        .phase-container::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: var(--bg-dark);
+            border: 4px solid var(--accent);
+            top: 32px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .right::after {
+            left: -10px;
+        }
+
+        /* Colores por fase */
+        .p1::after {
+            border-color: var(--primary);
+        }
+
+        .p2::after {
+            border-color: var(--accent);
+        }
+
+        .p3::after {
+            border-color: var(--purple);
+        }
+
+        .p4::after {
+            border-color: var(--gold);
+        }
+
+        /* Tarjetas */
+        .content {
+            padding: 30px;
+            background: var(--bg-panel);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .phase-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .pb-1 {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .pb-2 {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .pb-3 {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--purple);
+            border: 1px solid var(--purple);
+        }
+
+        .pb-4 {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+        }
+
+        .phase-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .activity-item i {
+            margin-top: 3px;
+        }
+
+        /* Tech Box dentro de cada tarjeta */
+        .tech-box {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #555;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .tech-icon {
+            font-size: 1.5rem;
+        }
+
+        .tech-text strong {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .tech-text span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Colores Tech Box */
+        .tb-1 {
+            border-color: var(--primary);
+        }
+
+        .tb-1 i {
+            color: var(--primary);
+        }
+
+        .tb-2 {
+            border-color: var(--accent);
+        }
+
+        .tb-2 i {
+            color: var(--accent);
+        }
+
+        .tb-3 {
+            border-color: var(--purple);
+        }
+
+        .tb-3 i {
+            color: var(--purple);
+        }
+
+        .tb-4 {
+            border-color: var(--gold);
+        }
+
+        .tb-4 i {
+            color: var(--gold);
+        }
+
+        /* --- ECONOMIC SECTION --- */
+        .money-section {
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .price-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            position: relative;
+        }
+
+        .recommended {
+            border: 2px solid var(--accent);
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 0 40px rgba(6, 182, 212, 0.1);
+        }
+
+        .rec-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--accent);
+            color: #000;
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 5px 15px;
+            border-bottom-left-radius: 10px;
+        }
+
+        .price-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin: 20px 0;
+        }
+
+        .price-sub {
+            font-size: 1rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .feature-check {
+            margin-bottom: 10px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .feature-check i {
+            color: var(--success);
+            margin-right: 10px;
+        }
+
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #2ea4a3;
+            /* Teal similar to image */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            text-decoration: none;
+            z-index: 9999;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+
+        .floating-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(46, 164, 163, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <h1>Transformación Lean & Digital: Roadmap 18 Meses</h1>
+            <p class="subtitle">
+                De la corrección de paros básicos a la Fábrica Inteligente 4.0. <br>
+                Una estrategia escalonada para financiar el crecimiento con los ahorros generados.
+            </p>
+        </div>
+
+        <div class="timeline">
+
+            <div class="phase-container left p1">
+                <div class="content">
+                    <div class="phase-badge pb-1">MES 1 - 3 | CIMIENTOS</div>
+                    <div class="phase-title">Cultura & SMED Saneamiento</div>
+                    <ul class="activity-list">
+                        <li class="activity-item"><i class="fas fa-users" style="color:var(--primary)"></i>
+                            <strong>Tiger Team:</strong> Selección y entrenamiento gamificado del equipo élite.
+                        </li>
+                        <li class="activity-item"><i class="fas fa-broom" style="color:var(--primary)"></i>
+                            <strong>Kaizen Saneamiento:</strong> Reducción de Limpieza Profunda (3h ➔ 1.5h).
+                        </li>
+                        <li class="activity-item"><i class="fas fa-check-double" style="color:var(--primary)"></i>
+                            <strong>Estándar Pre-Ops:</strong> Control de los micro-paros de 15 min.
+                        </li>
+                    </ul>
+                    <div class="tech-box tb-1">
+                        <i class="fas fa-mobile-alt tech-icon"></i>
+                        <div class="tech-text">
+                            <strong>App: Nexia CleanCheck</strong>
+                            <span>Validación digital de tiempos de limpieza con geo-referencia y foto.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase-container right p2">
+                <div class="content">
+                    <div class="phase-badge pb-2">MES 3 - 6 | VELOCIDAD</div>
+                    <div class="phase-title">SMED Cambios & Flujo</div>
+                    <ul class="activity-list">
+                        <li class="activity-item"><i class="fas fa-sync-alt" style="color:var(--accent)"></i>
+                            <strong>Kaizen Cambios:</strong> SMED enfocado en cambios de formato (Empaque y Embutido).
+                        </li>
+                        <li class="activity-item"><i class="fas fa-tools" style="color:var(--accent)"></i>
+                            <strong>Ingeniería:</strong> Fabricación de carros de set-up y marcas visuales en máquinas.
+                        </li>
+                        <li class="activity-item"><i class="fas fa-chart-line" style="color:var(--accent)"></i>
+                            <strong>Captura de Datos:</strong> Eliminación de bitácoras de papel en paros.
+                        </li>
+                    </ul>
+                    <div class="tech-box tb-2">
+                        <i class="fas fa-tablet-alt tech-icon"></i>
+                        <div class="tech-text">
+                            <strong>App: TurboChange Tracker</strong>
+                            <span>Cronometraje en vivo de cambios de producto. Alertas al supervisor si el tiempo excede
+                                el estándar.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase-container left p3">
+                <div class="content">
+                    <div class="phase-badge pb-3">MES 6 - 9 | PLANEACIÓN</div>
+                    <div class="phase-title">Heijunka & Digitalización</div>
+                    <ul class="activity-list">
+                        <li class="activity-item"><i class="fas fa-file-contract" style="color:var(--purple)"></i>
+                            <strong>Digitalización Total:</strong> Migración de POES, Ayudas Visuales y Manuales a
+                            Tablets (Adiós carpetas).
+                        </li>
+                        <li class="activity-item"><i class="fas fa-random" style="color:var(--purple)"></i>
+                            <strong>Heijunka (Nivelación):</strong> Primeros pasos para secuenciar producción lógica y
+                            reducir el "látigo".
+                        </li>
+                        <li class="activity-item"><i class="fas fa-link" style="color:var(--purple)"></i>
+                            <strong>Encadenamiento:</strong> Conexión de flujo informativo entre Almacén y Producción.
+                        </li>
+                    </ul>
+                    <div class="tech-box tb-3">
+                        <i class="fas fa-database tech-icon"></i>
+                        <div class="tech-text">
+                            <strong>Plataforma: Nexia DocuFlow</strong>
+                            <span>Repositorio digital vivo. El operador consulta el POES actualizado en la línea.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phase-container right p4">
+                <div class="content">
+                    <div class="phase-badge pb-4">MES 9 - 18 | EXCELENCIA 4.0</div>
+                    <div class="phase-title">Dashboard Ejecutivo (CEO)</div>
+                    <ul class="activity-list">
+                        <li class="activity-item"><i class="fas fa-network-wired" style="color:var(--gold)"></i>
+                            <strong>Integración Total:</strong> Cruce de datos de Limpieza, Cambios y Producción.
+                        </li>
+                        <li class="activity-item"><i class="fas fa-robot" style="color:var(--gold)"></i>
+                            <strong>Asistente IA:</strong> Predicción de fallas y sugerencias de planeación.
+                        </li>
+                        <li class="activity-item"><i class="fas fa-trophy" style="color:var(--gold)"></i>
+                            <strong>Replica:</strong> Expansión del modelo a Líneas de Jamones y Madurados.
+                        </li>
+                    </ul>
+                    <div class="tech-box tb-4">
+                        <i class="fas fa-chart-pie tech-icon"></i>
+                        <div class="tech-text">
+                            <strong>El "Dashboard Salchichas"</strong>
+                            <span>Visión financiera en tiempo real: OEE Financiero, Costo por Kilo y Pérdida por
+                                Paro.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="money-section">
+            <h2>Inversión Inteligente</h2>
+            <p style="color:var(--text-muted);">Seleccione el nivel de acompañamiento y riesgo compartido.</p>
+
+            <div class="pricing-grid">
+
+                <div class="price-card">
+                    <h3 style="color:var(--text-main);">Ejecución Táctica</h3>
+                    <div class="price-amount">$150k <span class="price-sub">/mes</span></div>
+                    <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:20px;">+ Costo de Licencias
+                        Software por separado</p>
+
+                    <div class="feature-check"><i class="fas fa-check"></i> 1 Consultor Jr. (Tiempo Completo)</div>
+                    <div class="feature-check"><i class="fas fa-check"></i> Supervisión Sr. Quincenal</div>
+                    <div class="feature-check"><i class="fas fa-times" style="color:#ef4444;"></i> Apps NO incluidas
+                    </div>
+                    <div class="feature-check"><i class="fas fa-times" style="color:#ef4444;"></i> Sin garantía de éxito
+                    </div>
+
+                    <button
+                        style="width:100%; padding:15px; border:1px solid #64748b; background:transparent; color:#64748b; border-radius:8px; margin-top:20px; cursor:pointer;">Seleccionar
+                        Básico</button>
+                </div>
+
+                <div class="price-card recommended">
+                    <div class="rec-badge">RECOMENDADO</div>
+                    <h3 style="color:var(--accent);">Socio Tecnológico</h3>
+                    <div class="price-amount">$190k <span class="price-sub">/mes</span></div>
+                    <p style="font-size:0.9rem; color:var(--success); font-weight:bold; margin-bottom:20px;">+ 15% del
+                        Ahorro Generado</p>
+
+                    <div class="feature-check"><i class="fas fa-check"></i> <strong>Consultor Sr. en Planta (3
+                            días/sem)</strong></div>
+                    <div class="feature-check"><i class="fas fa-check"></i> <strong>Suite de Apps INCLUIDA</strong>
+                    </div>
+                    <div class="feature-check"><i class="fas fa-check"></i> Soporte Remoto 24/7</div>
+                    <div class="feature-check"><i class="fas fa-check"></i> <strong>Auditoría Semanal de KPIs</strong>
+                    </div>
+
+                    <button
+                        style="width:100%; padding:15px; border:none; background:var(--accent); color:#000; font-weight:bold; border-radius:8px; margin-top:20px; cursor:pointer; box-shadow:0 5px 15px rgba(6,182,212,0.4);">Elegir
+                        Socio de Riesgo</button>
+                </div>
+
+                <div class="price-card">
+                    <h3 style="color:var(--primary);">Modelo Corporativo</h3>
+                    <div class="price-amount">$300k <span class="price-sub">/mes</span></div>
+                    <p style="font-size:0.9rem; color:var(--success); margin-bottom:20px;">+ 7% del Ahorro Generado</p>
+
+                    <div class="feature-check"><i class="fas fa-check"></i> 2 Consultores Sr. (3 días/sem)</div>
+                    <div class="feature-check"><i class="fas fa-check"></i> Suite de Apps INCLUIDA</div>
+                    <div class="feature-check"><i class="fas fa-check"></i> Gestión del Cambio (RH)</div>
+                    <div class="feature-check"><i class="fas fa-check"></i> Capacitación a Directivos</div>
+
+                    <button
+                        style="width:100%; padding:15px; border:1px solid var(--primary); background:transparent; color:var(--primary); border-radius:8px; margin-top:20px; cursor:pointer;">Seleccionar
+                        Full</button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <button class="floating-btn" onclick="history.back()">
+        <i class="fas fa-undo"></i> Regresar
+    </button>
+</body>
+
+</html>

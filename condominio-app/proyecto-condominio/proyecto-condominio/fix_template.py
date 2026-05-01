@@ -1,0 +1,556 @@
+
+import os
+
+file_path = r"c:\Users\dhira\.gemini\antigravity\scratch\nexia-soluciones\condominio-app\proyecto-condominio\proyecto-condominio\condominio\templates\condominio\dashboard_residente_nuevo.html"
+
+content = """<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Panel de Residente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <style>
+        /* Estilos optimizados para un look limpio y profesional */
+        body {
+            font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Jura', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-[#1a202c] text-white">
+
+    {% if messages %}
+    <div id="django-messages">
+        {% for message in messages %}
+        {% if 'mostrar_modal' in message.tags %}
+        <div class="hidden {{ message.tags }}">{{ message }}</div>
+
+        {% else %}
+        <div class="max-w-7xl mx-auto mt-4 px-4">
+            <div
+                class="p-4 mb-4 text-sm text-white rounded-lg {% if message.tags == 'error' %}bg-red-500{% elif message.tags == 'success' %}bg-green-500{% else %}bg-blue-500{% endif %} shadow-md">
+                {{ message }}
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {% include 'condominio/_header_villa.html' %}
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-white mt-6 mb-8">¡Bienvenido, {{ user.username }}!</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-[#2d3748] p-6 rounded-lg shadow-md">
+                <h2 class="text-lg font-semibold text-gray-300 mb-2">Mi Saldo Actual</h2>
+                {% if casa.saldo > 0 %}
+                <p class="text-4xl font-bold text-red-500">${{ casa.saldo }}</p>
+                <p class="text-gray-200 mt-1">Tienes un adeudo pendiente.</p>
+                {% elif casa.saldo < 0 %} <p class="text-4xl font-bold text-green-500">${{
+                    casa.saldo|stringformat:".2f"|slice:"1:" }}</p>
+                    <p class="text-gray-200 mt-1">Tienes saldo a favor. ¡Gracias!</p>
+                    {% else %}
+                    <p class="text-4xl font-bold text-blue-500">$0.00</p>
+                    <p class="text-gray-200 mt-1">Estás al corriente en tus pagos.</p>
+                    {% endif %}
+            </div>
+
+            <div class="bg-[#2d3748] p-6 rounded-lg shadow-md">
+                <h2 class="text-lg font-semibold text-gray-300 mb-2">Registrar un Pago</h2>
+
+                <form id="form-abono" action="{% url 'condominio:registrar_abono' %}" method="post"
+                    enctype="multipart/form-data" class="space-y-3">
+
+                    {% csrf_token %}
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-200">Monto Pagado:</label>
+                        <input type="number" name="monto" value="750" step="0.01" min="0"
+                            class="mt-1 block w-full rounded-md border border-gray-300 bg-[#2d3748] py-2 px-3 text-gray-200 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm"
+                            required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-200">Comprobante:</label>
+
+                        <input type="file" name="comprobante" accept="image/png, image/jpeg, image/jpg"
+                            class="mt-1 block w-full text-sm text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                            required>
+
+                        <p class="text-xs text-red-500 mt-1 font-semibold">
+                            ⚠️ Importante: Solo se aceptan imágenes (JPG, PNG). No subir archivos PDF.
+                        </p>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300">
+                        Enviar para Aprobación
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <a href="{% url 'condominio:vista_reservaciones' %}"
+                class="block p-6 bg-[#2d3748] rounded-lg shadow-md hover:shadow-xl transition-shadow text-center">
+                <h2 class="text-xl font-bold text-cyan-700">Reservar Área Común</h2>
+                <p class="text-gray-200 mt-2">Consulta y reserva la alberca, terraza y más.</p>
+            </a>
+            <a href="{% url 'condominio:crear_reserva_estacionamiento' %}"
+                class="block p-6 bg-[#2d3748] rounded-lg shadow-md hover:shadow-xl transition-shadow text-center border-t-4 border-slate-500">
+                <h2 class="text-xl font-bold text-slate-700">🚗 Estacionamiento Extra</h2>
+                <p class="text-gray-200 mt-2">Reserva un cajón público o adicional temporal.</p>
+            </a>
+            <a href="{% url 'condominio:prestar_estacionamiento' %}"
+                class="block p-6 bg-[#2d3748] rounded-lg shadow-md hover:shadow-xl transition-shadow text-center border-t-4 border-green-500">
+                <h2 class="text-xl font-bold text-green-700">🤝 Prestar mi Cajón</h2>
+                <p class="text-gray-200 mt-2">¿Saldrás de viaje? Préstaselo a un vecino.</p>
+            </a>
+            <a href="{% url 'condominio:propuestas_lista' %}"
+                class="block p-6 bg-[#2d3748] rounded-lg shadow-md hover:shadow-xl transition-shadow text-center">
+                <h2 class="text-xl font-bold text-orange-700">Votaciones y Propuestas</h2>
+                <p class="text-gray-200 mt-2">Participa en las decisiones de la comunidad.</p>
+            </a>
+
+            <a href="{% url 'condominio:crear_reporte' %}"
+                class="block p-6 bg-[#2d3748] rounded-lg shadow-md hover:shadow-xl transition-shadow text-center border-t-4 border-red-500">
+                <h2 class="text-xl font-bold text-red-700">⚠️ Reportar Vecino</h2>
+                <p class="text-gray-200 mt-2">Reporte anónimo de ruido, basura o infracciones.</p>
+            </a>
+
+            <a href="{% url 'condominio:directorio_comunidad' %}"
+                class="block p-6 bg-[#2d3748] rounded-lg shadow-md hover:shadow-xl transition-shadow text-center border-t-4 border-indigo-500">
+                <h2 class="text-xl font-bold text-indigo-700">🤝 Comunidad y Oficios</h2>
+                <p class="text-gray-200 mt-2">Conoce a tus vecinos y encuentra servicios locales.</p>
+            </a>
+        </div>
+
+        {% if propuestas_activas %}
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-r-lg my-8 shadow-sm">
+            <h3 class="font-bold">📢 ¡Votaciones Activas!</h3>
+            <p>Hay propuestas importantes que requieren tu voto. <a href="{% url 'condominio:propuestas_lista' %}"
+                    class="font-semibold underline hover:text-yellow-900">Ir a Votaciones</a></p>
+        </div>
+        {% endif %}
+
+        <div class="space-y-12">
+            <div>
+                <h2 class="text-2xl font-semibold text-white border-b-2 border-gray-200 pb-2 mb-4">Mi Estado de Cuenta
+                </h2>
+                <div class="overflow-x-auto bg-[#2d3748] rounded-lg shadow-lg">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-200 uppercase bg-gray-800 text-gray-200">
+                            <tr>
+                                <th scope="col" class="py-3 px-6">Fecha</th>
+                                <th scope="col" class="py-3 px-6">Concepto</th>
+                                <th scope="col" class="py-3 px-6">Cargos</th>
+                                <th scope="col" class="py-3 px-6">Abonos</th>
+                                <th scope="col" class="py-3 px-6">Estado</th>
+                                <th scope="col" class="py-3 px-6">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaccion in transacciones %}
+                            <tr class="border-b">
+                                <td class="py-4 px-6">{{ transaccion.fecha|date:"d M, Y" }}</td>
+                                <td class="py-4 px-6">{{ transaccion.concepto }}</td>
+                                <td class="py-4 px-6 text-red-600 font-semibold">
+                                    {% if transaccion.tipo == 'CARGO' %}${{ transaccion.monto }}{% else %}-{% endif %}
+                                </td>
+                                <td class="py-4 px-6 text-green-600 font-semibold">
+                                    {% if transaccion.tipo == 'ABONO' %}${{ transaccion.monto }}{% else %}-{% endif %}
+                                </td>
+                                <td class="py-4 px-6">
+                                    {% if transaccion.estado_aprobacion == 'APROBADO' %}
+                                    <span
+                                        class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Aprobado</span>
+                                    {% elif transaccion.estado_aprobacion == 'PENDIENTE' %}
+                                    <span
+                                        class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Pendiente</span>
+                                    {% else %}
+                                    <span
+                                        class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">{{
+                                        transaccion.get_estado_aprobacion_display }}</span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="py-4 px-6">
+                                    {% if transaccion.tipo == 'ABONO' and transaccion.estado_aprobacion == 'APROBADO' and transaccion.recibo_pdf %}
+                                    <a href="{% url 'condominio:descargar_recibo_transaccion' transaccion.id %}"
+                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                            xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
+                                            </path>
+                                        </svg>
+                                        Recibo
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="py-4 px-6 text-center text-gray-200">
+                                    No hay transacciones registradas todavía.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center border-b-2 border-gray-200 pb-2 mb-4">
+                    <h2 class="text-2xl font-semibold text-white">Mis Vehículos</h2>
+                    <a href="{% url 'condominio:agregar_vehiculo' %}"
+                        class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">+ Añadir
+                        Vehículo</a>
+                </div>
+                <div class="overflow-x-auto bg-[#2d3748] rounded-lg shadow-lg">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-200 uppercase bg-gray-800 text-gray-200">
+                            <tr>
+                                <th class="py-3 px-6">Placa</th>
+                                <th class="py-3 px-6">Marca y Modelo</th>
+                                <th class="py-3 px-6">Color</th>
+                                <th class="py-3 px-6">Estado</th>
+                                <th class="py-3 px-6">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vehiculo in vehiculos %}
+                            <tr class="border-b">
+                                <td class="py-4 px-6 font-medium text-gray-900">{{ vehiculo.placa }}</td>
+                                <td class="py-4 px-6">{{ vehiculo.marca }} {{ vehiculo.modelo }}</td>
+                                <td class="py-4 px-6">{{ vehiculo.color }}</td>
+                                <td class="py-4 px-6 font-semibold">{{ vehiculo.get_estado_display }}</td>
+                                <td class="py-4 px-6">
+                                    {% if vehiculo.estado != 'Aprobado' %}
+                                    <a href="{% url 'condominio:eliminar_vehiculo' vehiculo.id %}"
+                                        class="font-medium text-red-600 hover:underline">Eliminar</a>
+                                    {% else %}-{% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-6 text-gray-200">No tienes vehículos registrados.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <div class="flex justify-between items-center border-b-2 border-gray-200 pb-2 mb-4">
+                    <h2 class="text-2xl font-semibold text-white">Mis Reportes Enviados</h2>
+                </div>
+                <div class="overflow-x-auto bg-[#2d3748] rounded-lg shadow-lg mb-12">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-200 uppercase bg-gray-800 text-gray-200">
+                            <tr>
+                                <th class="py-3 px-6">Fecha</th>
+                                <th class="py-3 px-6">Contra</th>
+                                <th class="py-3 px-6">Motivo</th>
+                                <th class="py-3 px-6">Estado</th>
+                                <th class="py-3 px-6">Resolución</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reporte in mis_reportes %}
+                            <tr class="border-b hover:bg-gray-800 text-gray-200">
+                                <td class="py-4 px-6">{{ reporte.fecha_creacion|date:"d M, Y" }}</td>
+                                <td class="py-4 px-6 font-medium">Casa {{ reporte.casa_infractora.numero_casa }}</td>
+                                <td class="py-4 px-6">{{ reporte.categoria.nombre }}</td>
+                                <td class="py-4 px-6">
+                                    {% if reporte.estado == 'PENDIENTE' %}
+                                    <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">En
+                                        Revisión</span>
+                                    {% elif reporte.estado == 'MULTA' %}
+                                    <span
+                                        class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-bold">Procedió
+                                        (Multa)</span>
+                                    {% else %}
+                                    <span
+                                        class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Rechazado</span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-4 px-6 text-gray-200 italic text-xs">
+                                    {% if reporte.resolucion_admin %}
+                                    <div class="flex items-center gap-2">
+                                        <span>{{ reporte.resolucion_admin|truncatechars:25 }}</span>
+
+                                        <button onclick="verResolucion('{{ reporte.resolucion_admin|escapejs }}')"
+                                            class="text-blue-600 hover:text-blue-800 font-bold underline cursor-pointer"
+                                            title="Leer resolución completa">
+                                            Ver más
+                                        </button>
+                                    </div>
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-6 text-gray-200">No has realizado reportes.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="visitas">
+                <div class="flex justify-between items-center border-b-2 border-gray-200 pb-3 mb-4">
+                    <h2 class="text-2xl font-bold text-white">Mis Visitas</h2>
+                    <a href="{% url 'condominio:registrar_visita' %}"
+                        class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">+ Registrar
+                        Visita</a>
+                </div>
+                <div class="overflow-x-auto bg-[#2d3748] rounded-lg shadow-lg">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-200 uppercase bg-gray-800 text-gray-200">
+                            <tr>
+                                <th class="py-3 px-6">Visitante</th>
+                                <th class="py-3 px-6">Fecha y Hora</th>
+                                <th class="py-3 px-6">Estado</th>
+                                <th class="py-3 px-6">Enlace de Acceso</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for visitante in visitantes %}
+                            <tr class="border-b">
+                                <td class="py-4 px-6 font-medium text-gray-900">{{ visitante.nombre_visitante }}</td>
+                                <td class="py-4 px-6">{{ visitante.fecha_programada|date:"d M, Y, P" }}</td>
+                                <td class="py-4 px-6 font-semibold">{{ visitante.get_estado_display }}</td>
+                                <td class="py-4 px-6">
+                                    {% if not visitante.foto_identificacion %}
+                                    <div class="flex items-center">
+                                        <input type="text" id="link-{{ visitante.id }}"
+                                            value="{{ request.scheme }}://{{ request.get_host }}{% url 'condominio:vista_visitante' visitante.token_acceso %}"
+                                            readonly
+                                            class="bg-gray-800 text-gray-200 border-gray-300 text-gray-900 text-sm rounded-l-lg p-2.5 w-full">
+                                        <button
+                                            class="copy-btn bg-blue-600 text-white p-2.5 rounded-r-lg hover:bg-blue-700"
+                                            data-target="link-{{ visitante.id }}">Copiar</button>
+                                    </div>
+                                    {% else %}
+                                    <span class="text-gray-200">Datos Recibidos</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-6 text-gray-200">No tienes visitas programadas.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-center space-x-4 mt-12 pt-8 border-t border-gray-200">
+            <a href="{% url 'password_change' %}"
+                class="bg-gray-200 text-white font-semibold py-2 px-5 rounded-lg hover:bg-gray-300">
+                Cambiar Contraseña
+            </a>
+            <form action="{% url 'logout' %}" method="post" class="inline-block">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-red-700">
+                    Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <div id="modalAbonoConfirmacion"
+        class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-[#2d3748] rounded-lg shadow-xl p-6 md:p-8 max-w-md w-full mx-4">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold text-white">✅ ¡Comprobante Enviado!</h2>
+                <div class="mt-4 text-gray-600 space-y-3">
+                    <p>Tu abono ha sido mandado a revisión exitosamente.</p>
+                    <p>En los próximos 2 días hábiles podrás <strong>descargar tu recibo oficial</strong> desde esta
+                        misma aplicación.</p>
+                </div>
+                <hr class="my-4">
+                <p class="text-sm text-gray-200">
+                    Te recordamos que los <strong>gafetes de acceso vehicular</strong> se entregan únicamente los días
+                    10 de cada mes.
+                </p>
+                <div class="mt-6">
+                    <button id="closeModalBtn"
+                        class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300">
+                        Entendido
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modalDuplicado"
+        class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-50">
+        <div class="bg-[#2d3748] rounded-lg shadow-2xl p-6 max-w-sm w-full mx-4 border-t-4 border-yellow-500">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
+                    <svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <h2 class="text-xl font-bold text-white mb-2">⚠️ ¡Espera un momento!</h2>
+                <p class="text-gray-600 text-sm">
+                    Ya detectamos un pago idéntico registrado hace unos instantes.
+                    <br><br>
+                    <strong>No es necesario subirlo de nuevo.</strong> Tu pago anterior ya está en revisión.
+                </p>
+                <div class="mt-6">
+                    <button onclick="document.getElementById('modalDuplicado').classList.add('hidden')"
+                        class="w-full bg-gray-800 text-white font-bold py-2 px-4 rounded hover:bg-gray-900 transition">
+                        Entendido, gracias
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modalResolucion"
+        class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 px-4">
+        <div class="bg-[#2d3748] rounded-lg shadow-xl max-w-lg w-full overflow-hidden">
+            <div class="bg-gray-800 text-gray-200 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-white">📄 Resolución Administrativa</h3>
+                <button onclick="document.getElementById('modalResolucion').classList.add('hidden')"
+                    class="text-gray-200 hover:text-gray-200 font-bold text-xl">&times;</button>
+            </div>
+
+            <div class="p-6">
+                <p id="textoResolucionCompleta" class="text-gray-200 text-sm leading-relaxed whitespace-pre-line"></p>
+            </div>
+
+            <div class="bg-gray-800 text-gray-200 px-6 py-3 flex justify-end">
+                <button onclick="document.getElementById('modalResolucion').classList.add('hidden')"
+                    class="bg-blue-600 text-white font-medium py-2 px-4 rounded hover:bg-blue-700 transition">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Script para el botón de copiar enlace de visitante
+        document.addEventListener('DOMContentLoaded', function () {
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const targetId = this.dataset.target;
+                    const linkInput = document.getElementById(targetId);
+                    linkInput.select();
+                    linkInput.setSelectionRange(0, 99999);
+                    try {
+                        navigator.clipboard.writeText(linkInput.value);
+                        const originalText = this.textContent;
+                        this.textContent = '¡Copiado!';
+                        this.classList.add('bg-green-500');
+                        this.classList.remove('bg-blue-600');
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.classList.remove('bg-green-500');
+                            this.classList.add('bg-blue-600');
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Error al copiar el enlace: ', err);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Lógica del Modal de Éxito (Verde) ---
+            const modalExito = document.getElementById('modalAbonoConfirmacion');
+            const closeExito = document.getElementById('closeModalBtn');
+
+            // --- Lógica del Modal de Duplicado (Amarillo) ---
+            const modalDuplicado = document.getElementById('modalDuplicado');
+
+            const messagesContainer = document.getElementById('django-messages');
+
+            if (messagesContainer) {
+                // Checar si hay éxito
+                if (messagesContainer.querySelector('.mostrar_modal_abono')) {
+                    modalExito.classList.remove('hidden');
+                }
+                // Checar si hay duplicado (NUEVO)
+                if (messagesContainer.querySelector('.mostrar_modal_duplicado')) {
+                    modalDuplicado.classList.remove('hidden');
+                }
+            }
+
+            // Cerrar modal éxito
+            if (closeExito) {
+                closeExito.addEventListener('click', () => modalExito.classList.add('hidden'));
+            }
+
+            // Cerrar al dar clic fuera
+            window.onclick = function (event) {
+                if (event.target == modalExito) modalExito.classList.add('hidden');
+                if (event.target == modalDuplicado) modalDuplicado.classList.add('hidden');
+            }
+        });
+        function verResolucion(textoCompleto) {
+            // 1. Poner el texto dentro del modal
+            document.getElementById('textoResolucionCompleta').textContent = textoCompleto;
+            // 2. Mostrar el modal (quitando la clase hidden)
+            document.getElementById('modalResolucion').classList.remove('hidden');
+        }
+    </script>
+    <script>
+        // Script para evitar doble envío en el formulario de abono
+        const formAbono = document.getElementById('form-abono');
+        if (formAbono) {
+            formAbono.addEventListener('submit', function (e) {
+                const btn = this.querySelector('button[type="submit"]');
+
+                // Si ya se envió, prevenimos otro envío
+                if (btn.disabled) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Desactivamos visualmente
+                btn.disabled = true;
+                btn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Enviando...
+            `;
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+            });
+        }
+    </script>
+</body>
+
+</html>"""
+with open(file_path, "w", encoding="utf-8") as f:
+    f.write(content)
+
+print(f"File successfully overwritten at: {file_path}")

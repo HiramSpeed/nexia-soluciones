@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Panel de Residente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+    <style>
+        /* Estilos optimizados para un look limpio y profesional */
+        body {
+            font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* Override Tailwind defaults with Theme variables for consistency */
+        h1,
+        h2,
+        h3 {
+            font-family: 'Jura', sans-serif;
+        }
+
+        .estado-aprobado {
+            background-color: rgba(0, 255, 0, 0.1);
+            color: #4ade80;
+        }
+
+        .estado-pendiente-de-aprobacion {
+            background-color: rgba(255, 165, 0, 0.1);
+            color: #fbbf24;
+        }
+    </style>
+</head>
+
+<body class="bg-[#1a202c] text-white">
+
+    {% include 'condominio/_header_villa.html' %}
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-white mt-6 mb-8">¡Bienvenido, {{ user.username }}!</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-[#2d3748] p-6 rounded-lg shadow-md">
+                <h2 class="text-lg font-semibold text-gray-300 mb-2">Mi Saldo Actual</h2>
+                {% if casa.saldo > 0 %}
+                <p class="text-4xl font-bold text-red-500">${{ casa.saldo }}</p>
+                <p class="text-gray-200 mt-1">Tienes un adeudo pendiente.</p>
+                {% elif casa.saldo < 0 %} <p class="text-4xl font-bold text-green-500">${{
+                    casa.saldo|stringformat:".2f"|slice:"1:" }}</p>
+                    <p class="text-gray-200 mt-1">Tienes saldo a favor. ¡Gracias!</p>
+                    {% else %}
+                    <p class="text-4xl font-bold text-blue-500">$0.00</p>
+                    <p class="text-gray-200 mt-1">Estás al corriente en tus pagos.</p>
+                    {% endif %}
+            </div>
+            <div class="bg-[#2d3748] p-6 rounded-lg shadow-md">
+                <h2 class="text-lg font-semibold text-gray-300 mb-2">Registrar un Pago</h2>
+                <form action="{% url 'registrar_abono' %}" method="post" enctype="multipart/form-data"
+                    class="space-y-3">
+                    {% csrf_token %}
+                    <div>
+                        <label for="id_monto" class="block text-sm font-medium text-gray-200">Monto Pagado:</label>
+                        {{ abono_form.monto }}
+                    </div>
+                    <div>
+                        <label for="id_comprobante" class="block text-sm font-medium text-gray-200">Comprobante:</label>
+                        {{ abono_form.comprobante }}
+                    </div>
+                    <button type="submit"
+                        class="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300">
+                        Enviar para Aprobación
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <a href="{% url 'vista_reservaciones' %}"
+                class="block p-6 bg-[#2d3748] rounded-lg shadow-md hover:shadow-xl transition-shadow text-center">
+                <h2 class="text-xl font-bold text-cyan-700">Reservar Área Común</h2>
+                <p class="text-gray-200 mt-2">Consulta y reserva la alberca, terraza y más.</p>
+            </a>
+            <a href="{% url 'propuestas_lista' %}"
+                class="block p-6 bg-[#2d3748] rounded-lg shadow-md hover:shadow-xl transition-shadow text-center">
+                <h2 class="text-xl font-bold text-orange-700">Votaciones y Propuestas</h2>
+                <p class="text-gray-200 mt-2">Participa en las decisiones de la comunidad.</p>
+            </a>
+        </div>
+
+        {% if propuestas_activas %}
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded-r-lg my-8 shadow-sm">
+            <h3 class="font-bold">📢 ¡Votaciones Activas!</h3>
+            <p>Hay propuestas importantes que requieren tu voto. <a href="{% url 'propuestas_lista' %}"
+                    class="font-semibold underline hover:text-yellow-900">Ir a Votaciones</a></p>
+        </div>
+        {% endif %}
+
+        <div class="space-y-12">
+            <div>
+                <h2 class="text-2xl font-semibold text-white border-b-2 border-gray-200 pb-2 mb-4">Mi Estado de Cuenta
+                </h2>
+                <div class="overflow-x-auto bg-[#2d3748] rounded-lg shadow-lg">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-200 uppercase bg-gray-800 text-gray-200">
+                            <tr>
+                                <th class="py-3 px-6">Fecha</th>
+                                <th class="py-3 px-6">Concepto</th>
+                                <th class="py-3 px-6">Cargo</th>
+                                <th class="py-3 px-6">Abono</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaccion in transacciones %}
+                            <tr class="border-b">
+                                <td class="py-4 px-6">{{ transaccion.fecha|date:"d M, Y" }}</td>
+                                <td class="py-4 px-6">{{ transaccion.concepto }}</td>
+                                <td class="py-4 px-6 text-red-600 font-semibold">
+                                    {% if transaccion.tipo == 'CARGO' %}${{ transaccion.monto }}{% else %}-{% endif %}
+                                </td>
+
+                                <td class="py-4 px-6 text-green-600 font-semibold">
+                                    {% if transaccion.tipo == 'ABONO' %}
+                                    <div class="flex justify-between items-center">
+                                        <span>${{ transaccion.monto }}</span>
+
+                                        {% if transaccion.estado_aprobacion == 'APROBADO' and transaccion.recibo_pdf %}
+                                        <a href="{% url 'descargar_recibo_transaccion' transaccion.id %}"
+                                            class="ml-4 text-xs bg-blue-500 text-white font-bold py-1 px-2 rounded hover:bg-blue-600 no-underline">
+                                            Descargar Recibo
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-6 text-gray-200">No hay transacciones registradas.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center border-b-2 border-gray-200 pb-2 mb-4">
+                    <h2 class="text-2xl font-semibold text-white">Mis Vehículos</h2>
+                    <a href="{% url 'agregar_vehiculo' %}"
+                        class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">+ Añadir
+                        Vehículo</a>
+                </div>
+                <div class="overflow-x-auto bg-[#2d3748] rounded-lg shadow-lg">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-200 uppercase bg-gray-800 text-gray-200">
+                            <tr>
+                                <th class="py-3 px-6">Placa</th>
+                                <th class="py-3 px-6">Marca y Modelo</th>
+                                <th class="py-3 px-6">Color</th>
+                                <th class="py-3 px-6">Estado</th>
+                                <th class="py-3 px-6">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vehiculo in vehiculos %}
+                            <tr class="border-b estado-{{ vehiculo.estado|slugify }}">
+                                <td class="py-4 px-6 font-medium text-gray-900">{{ vehiculo.placa }}</td>
+                                <td class="py-4 px-6">{{ vehiculo.marca }} {{ vehiculo.modelo }}</td>
+                                <td class="py-4 px-6">{{ vehiculo.color }}</td>
+                                <td class="py-4 px-6 font-semibold">{{ vehiculo.get_estado_display }}</td>
+                                <td class="py-4 px-6">
+                                    {% if vehiculo.estado != 'Aprobado' %}
+                                    <a href="{% url 'eliminar_vehiculo' vehiculo.id %}"
+                                        class="font-medium text-red-600 hover:underline">Eliminar</a>
+                                    {% else %}-{% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-6 text-gray-200">No tienes vehículos registrados.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="visitas">
+                <div class="flex justify-between items-center border-b-2 border-gray-200 pb-3 mb-4">
+                    <h2 class="text-2xl font-bold text-white">Mis Visitas</h2>
+                    <a href="{% url 'registrar_visita' %}"
+                        class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">+ Registrar
+                        Visita</a>
+                </div>
+                <div class="overflow-x-auto bg-[#2d3748] rounded-lg shadow-lg">
+                </div>
+            </div>
+
+            <div id="paqueteria">
+                <div class="flex justify-between items-center border-b-2 border-gray-200 pb-3 mb-4">
+                    <h2 class="text-2xl font-bold text-white">Mi Paquetería</h2>
+                    <a href="{% url 'residente_registrar_paquete' %}"
+                        class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">+ Registrar
+                        Paquete</a>
+                </div>
+                <div class="overflow-x-auto bg-[#2d3748] rounded-lg shadow-lg">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="flex items-center justify-center space-x-4 mt-12 pt-8 border-t border-gray-200">
+            <a href="{% url 'password_change' %}"
+                class="bg-gray-200 text-white font-semibold py-2 px-5 rounded-lg hover:bg-gray-300">
+                Cambiar Contraseña
+            </a>
+            <form action="{% url 'logout' %}" method="post" class="inline-block">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-600 text-white font-semibold py-2 px-5 rounded-lg hover:bg-red-700">
+                    Cerrar Sesión
+                </button>
+            </form>
+        </div>
+
+    </main>
+</body>
+
+</html>
