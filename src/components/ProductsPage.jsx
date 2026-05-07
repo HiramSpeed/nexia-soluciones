@@ -26,6 +26,18 @@ const ProductsPage = ({ openModal }) => {
     }, []);
 
     useEffect(() => {
+        const slug = new URLSearchParams(window.location.search).get('app');
+        if (!slug) return;
+        const allProducts = groups.flatMap(g => g.products);
+        const product = allProducts.find(p => p.slug === slug);
+        if (!product || !product.ctaActive) return;
+        setExpandedCard(product.id);
+        setTimeout(() => {
+            document.getElementById(`card-${product.slug}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
         if (formStatus === 'success') {
             const timer = setTimeout(() => {
                 handleCollapse();
@@ -258,6 +270,7 @@ const ProductsPage = ({ openModal }) => {
                     return (
                         <div
                             key={p.id}
+                            id={`card-${p.slug}`}
                             style={{
                                 backgroundColor: 'var(--card-background)',
                                 borderRadius: '16px',
