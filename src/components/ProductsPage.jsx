@@ -31,10 +31,12 @@ const ProductsPage = ({ openModal }) => {
         const allProducts = groups.flatMap(g => g.products);
         const product = allProducts.find(p => p.slug === slug);
         if (!product || !product.ctaActive) return;
+        const group = groups.find(g => g.products.some(p => p.slug === slug));
+        if (group) setActiveGroup(group.id);
         setExpandedCard(product.id);
         setTimeout(() => {
             document.getElementById(`card-${product.slug}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
+        }, 800);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
