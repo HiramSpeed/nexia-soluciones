@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import ContactModal from './components/ContactModal';
 import PrivacyPolicyModal from './components/PrivacyPolicyModal';
 import ProductsPage from './components/ProductsPage';
+import AppLanding from './components/AppLanding';
 import ScrollToTop from './components/ScrollToTop';
 import ParticleCanvas from './components/ParticleCanvas';
 // import Testimonials from './components/Testimonials'; // TEMPORALMENTE DESHABILITADO - Pendiente de autorización de clientes
@@ -79,6 +80,9 @@ function App() {
               <Academy openModal={openModal} />
             </>
           } />
+          <Route path="/planner" element={<AppLanding slug="nexia-planner" />} />
+          <Route path="/facturacion" element={<AppLanding slug="nexia-facturacion" />} />
+          <Route path="/tienda" element={<AppLanding slug="nexia-tienda" />} />
         </Routes>
 
         {/* SECCIÓN TEMPORALMENTE DESHABILITADA */}
