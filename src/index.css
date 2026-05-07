@@ -157,6 +157,27 @@ canvas {
   }
 }
 
+@media (max-width: 480px) {
+  /* Hero: botón sale del flujo absoluto y aparece debajo de la imagen */
+  .hero-cta-overlay {
+    position: static;
+    transform: none;
+    text-align: center;
+    padding: 16px 20px;
+    background: #0f2a5e;
+  }
+  .hero-cta-btn {
+    width: 100%;
+    font-size: 0.9rem;
+    padding: 14px 20px;
+  }
+
+  /* MissionVision: elimina justify en móvil (evita ríos de espacios) */
+  #filosofia p {
+    text-align: left !important;
+  }
+}
+
 .btn-online-soon {
   margin-top: 12px;
   border: 1px dashed #64748b;
