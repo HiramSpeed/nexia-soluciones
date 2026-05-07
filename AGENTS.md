@@ -1,9 +1,25 @@
 # AGENTS.md — nexia-soluciones Landing Page
 > Estado del proyecto. Actualizar al cerrar cada tarea.
-> Última actualización: 2026-05-06
+> Última actualización: 2026-05-07
 
 ## Estado actual
-Landing page single-page con scroll continuo. Hero reemplazado por imagen completa con botón CTA dorado superpuesto. Todos los correos migrados a Resend via n8n (nexia-ventas + nexia-contacto) con BCC a daniel.navarro@ y juan.garces@. Workflows n8n con diseño visual profesional unificado (logo Supabase Storage, header degradado, footer). Rama feature/scroll-continuo lista para review y merge.
+Landing page single-page con scroll continuo. Rutas dedicadas por app operativas (/planner, /facturacion, /tienda). Deploy via Hostinger GIT sincronizado con main. dist/ incluido en git (no en .gitignore) — requerido por el proceso de deploy de Hostinger.
+
+## Deploy en Hostinger — Proceso definitivo ✅
+1. Agente hace cambios en el código
+2. `npm run build` (dist/ está incluido en git, NO en .gitignore)
+3. `git push origin main`
+4. Hostinger → GIT → Implementar
+5. Avanzado → Administrador de caché → Borrar caché
+6. Ctrl+F5 en navegador
+
+## Rutas dedicadas por app (AppLanding.jsx)
+- `nexiasoluciones.com.mx/planner` → NexIA Planner
+- `nexiasoluciones.com.mx/facturacion` → Nexia Gastos
+- `nexiasoluciones.com.mx/tienda` → Nexia Tienda
+- Solo apps con `ctaActive: true` tienen ruta dedicada
+- Para agregar nueva app: añadir objeto al array `products[]` en `AppLanding.jsx` + nueva `<Route>` en `App.jsx`
+- Estas URLs se usan para campañas de venta por WhatsApp, Telegram, Facebook
 
 ## Completado ✅
 - [x] Restauración del código desde Hostinger a ~/dev/nexia-soluciones
@@ -44,8 +60,7 @@ Landing page single-page con scroll continuo. Hero reemplazado por imagen comple
 - [x] Flujo de activación manual (activate_user.sh → webhook nexia-activate) operativo y retorna HTTP 200
 
 ## Pendiente crítico ⚠️
-- [ ] Merge feature/scroll-continuo → main cuando Daniel apruebe
-- [ ] Deploy a Hostinger
+- [ ] Verificar rutas /planner /facturacion /tienda en producción tras deploy
 - [ ] CORS nexia-notificarme: el webhook falla desde localhost con CORS error. nexia-ventas y nexia-contacto funcionan correctamente. Posible causa: workflow nuevo necesita reinicio de n8n o configuración adicional. Revisar via SSH al VPS: docker restart n8n o verificar headers CORS en el contenedor.
 
 ## Pendiente 🔄
@@ -56,10 +71,10 @@ Landing page single-page con scroll continuo. Hero reemplazado por imagen comple
 - [ ] Imagen para card Nexia Tienda (app-nexia-tienda.jpeg)
 
 ## Restricciones activas
-- NUNCA git push a main — deploy es manual vía Hostinger
 - NUNCA modificar copy/textos — están aprobados y liberados
 - NUNCA tratar este proyecto como SaaS
 - NO git add, git commit, ni git push sin autorización explícita de Daniel
+- SIEMPRE incluir dist/ en el commit — Hostinger lo requiere para el deploy vía GIT
 
 ## Agente responsable
 Vibecoder — cambios visuales únicamente, previa aprobación de Daniel (Vibe Check)
