@@ -1,9 +1,9 @@
 # AGENTS.md — nexia-soluciones Landing Page
 > Estado del proyecto. Actualizar al cerrar cada tarea.
-> Última actualización: 2026-04-22
+> Última actualización: 2026-05-06
 
 ## Estado actual
-Landing page single-page con scroll continuo. Hero reemplazado por imagen completa con botón CTA dorado superpuesto. Todos los correos migrados a Resend via n8n (nexia-ventas + nexia-contacto) con BCC a daniel.navarro@ y juan.garces@. Rama feature/scroll-continuo lista para review y merge.
+Landing page single-page con scroll continuo. Hero reemplazado por imagen completa con botón CTA dorado superpuesto. Todos los correos migrados a Resend via n8n (nexia-ventas + nexia-contacto) con BCC a daniel.navarro@ y juan.garces@. Workflows n8n con diseño visual profesional unificado (logo Supabase Storage, header degradado, footer). Rama feature/scroll-continuo lista para review y merge.
 
 ## Completado ✅
 - [x] Restauración del código desde Hostinger a ~/dev/nexia-soluciones
@@ -29,6 +29,20 @@ Landing page single-page con scroll continuo. Hero reemplazado por imagen comple
 - [x] HTML profesional en correos de nexia-ventas con logo, slogan y datos bancarios
 - [x] Flujos n8n verificados y activos: nexia-ventas + nexia-contacto
 
+## Cambios n8n — 2026-05-06 ✅
+- [x] nexia-ventas: datos bancarios reales — Banco Santander, CLABE 014215655116141623, Titular NEXIA SOLUCIONES SAS
+- [x] nexia-ventas: monto con leyenda "(primer año promoción)"
+- [x] nexia-ventas: texto "En breve recibirás acceso a tu app." (antes: "En menos de 12 horas")
+- [x] nexia-ventas: logo corregido a Supabase Storage (logo-nexia-white.png)
+- [x] NexIA - Activación de Usuarios (n7a + n7b): diseño visual profesional aplicado
+      · Header degradado #111827 → #1f2937 con logo transparente desde Supabase Storage
+      · Slogan "Digitaliza lo Aburrido" en #00A3FF
+      · Fondo #f4f4f4, contenedor blanco con border-radius y sombra
+      · Footer gris #f9fafb con nexiasoluciones.com.mx
+      · Firma "Equipo NexIA Soluciones"
+- [x] NexIA - Activación de Usuarios: acentos corregidos ("rápido", "contraseña")
+- [x] Flujo de activación manual (activate_user.sh → webhook nexia-activate) operativo y retorna HTTP 200
+
 ## Pendiente crítico ⚠️
 - [ ] Merge feature/scroll-continuo → main cuando Daniel apruebe
 - [ ] Deploy a Hostinger
@@ -36,7 +50,7 @@ Landing page single-page con scroll continuo. Hero reemplazado por imagen comple
 
 ## Pendiente 🔄
 - [ ] Verificar hero en mobile — posición del botón CTA
-- [ ] Logo en correos — pendiente URL pública funcional (nexiasoluciones.com.mx/assets/logo-nexia-white.png)
+- [x] Logo en correos — resuelto: URL Supabase Storage operativa en todos los workflows
 - [x] Imágenes agregadas a cards PDCA, VSM, SMED, Heijunka, Facturación
 - [x] npm run build sin errores — build limpio en 6.25s
 - [ ] Imagen para card Nexia Tienda (app-nexia-tienda.jpeg)
