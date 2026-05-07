@@ -145,19 +145,7 @@ canvas {
   box-shadow: 0 6px 24px rgba(245,166,35,0.6);
 }
 
-@media (max-width: 768px) {
-  .hero-cta-overlay {
-    bottom: 10%;
-    right: 50%;
-    transform: translateX(50%);
-  }
-  .hero-cta-btn {
-    font-size: 0.85rem;
-    padding: 12px 20px;
-  }
-}
-
-@media (max-width: 480px) {
+@media (max-width: 1024px) {
   /* Hero: botón sale del flujo absoluto y aparece debajo de la imagen */
   .hero-cta-overlay {
     position: static;
@@ -172,7 +160,7 @@ canvas {
     padding: 14px 20px;
   }
 
-  /* MissionVision: elimina justify en móvil (evita ríos de espacios) */
+  /* MissionVision: elimina justify en tablet/móvil */
   #filosofia p {
     text-align: left !important;
   }
