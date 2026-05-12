@@ -9,7 +9,13 @@ import appNexiaTienda from '../assets/app-nexia-tienda.jpeg';
 
 const ProductsPage = ({ openModal }) => {
     const [expandedCard, setExpandedCard] = useState(null);
-    const [formData, setFormData] = useState({ nombre: '', email: '', telefono: '', mensaje: '' });
+    const [formData, setFormData] = useState({
+        nombre: '', email: '', telefono: '', mensaje: '',
+        requiere_factura: false,
+        factura_rfc: '', factura_razon_social: '',
+        factura_uso_cfdi: '', factura_regimen_fiscal: '',
+        factura_correo: '',
+    });
     const [formStatus, setFormStatus] = useState('idle');
     const [activeGroup, setActiveGroup] = useState('todos');
 
@@ -52,7 +58,13 @@ const ProductsPage = ({ openModal }) => {
 
     const handleExpand = (p) => {
         setExpandedCard(p.id);
-        setFormData({ nombre: '', email: '', telefono: '', mensaje: '' });
+        setFormData({
+            nombre: '', email: '', telefono: '', mensaje: '',
+            requiere_factura: false,
+            factura_rfc: '', factura_razon_social: '',
+            factura_uso_cfdi: '', factura_regimen_fiscal: '',
+            factura_correo: '',
+        });
         setFormStatus('idle');
     };
 
@@ -62,7 +74,16 @@ const ProductsPage = ({ openModal }) => {
     };
 
     const handleChange = (e) => {
-        setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+        const { name, type, value, checked } = e.target;
+        if (name === 'requiere_factura') {
+            setFormData(prev => ({
+                ...prev,
+                requiere_factura: checked,
+                factura_correo: checked ? (prev.factura_correo || prev.email) : '',
+            }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+        }
     };
 
     const handleSubmit = async (e, p) => {
@@ -70,7 +91,12 @@ const ProductsPage = ({ openModal }) => {
         setFormStatus('sending');
         try {
             const webhook = import.meta.env.VITE_N8N_VENTAS_WEBHOOK;
-            const body = { appName: p.title, appPrice: p.price, ...formData };
+            const slugMap = {
+                'nexia-planner': 'scholar',
+                'nexia-facturacion': 'facturacion',
+                'nexia-tienda': 'tienda',
+            };
+            const body = { appName: p.title, appPrice: p.price, appSlug: slugMap[p.slug] || p.slug, ...formData };
             const res = await fetch(webhook, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -360,6 +386,33 @@ const ProductsPage = ({ openModal }) => {
                                                     <input style={inputStyle} name="nombre" placeholder="Nombre completo *" required value={formData.nombre} onChange={handleChange} />
                                                     <input style={inputStyle} name="email" type="email" placeholder="Correo electrónico *" required value={formData.email} onChange={handleChange} />
                                                     <input style={inputStyle} name="telefono" placeholder="Teléfono (opcional)" value={formData.telefono} onChange={handleChange} />
+                                                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', color: 'var(--secondary-text-color)', fontSize: '0.9rem', userSelect: 'none' }}>
+                                                        <input type="checkbox" name="requiere_factura" checked={formData.requiere_factura} onChange={handleChange} style={{ width: '16px', height: '16px', accentColor: '#00A3FF', cursor: 'pointer' }} />
+                                                        ¿Necesitas factura?
+                                                    </label>
+                                                    {formData.requiere_factura && (
+                                                        <>
+                                                            <input style={inputStyle} name="factura_rfc" placeholder="RFC *" required maxLength={13} value={formData.factura_rfc} onChange={handleChange} />
+                                                            <input style={inputStyle} name="factura_razon_social" placeholder="Razón Social *" required value={formData.factura_razon_social} onChange={handleChange} />
+                                                            <select style={inputStyle} name="factura_uso_cfdi" required value={formData.factura_uso_cfdi} onChange={handleChange}>
+                                                                <option value="">Uso CFDI *</option>
+                                                                <option value="G03">G03 — Gastos en general</option>
+                                                                <option value="S01">S01 — Sin efectos fiscales</option>
+                                                                <option value="G01">G01 — Adquisición de mercancias</option>
+                                                                <option value="I08">I08 — Licencias y derechos de autor</option>
+                                                                <option value="D10">D10 — Pagos por servicios educativos</option>
+                                                            </select>
+                                                            <select style={inputStyle} name="factura_regimen_fiscal" required value={formData.factura_regimen_fiscal} onChange={handleChange}>
+                                                                <option value="">Régimen Fiscal *</option>
+                                                                <option value="601">601 — General de Ley Personas Morales</option>
+                                                                <option value="612">612 — Personas Físicas con Act. Empresariales</option>
+                                                                <option value="626">626 — Régimen Simplificado de Confianza</option>
+                                                                <option value="621">621 — Incorporación Fiscal</option>
+                                                                <option value="603">603 — Personas Morales sin Fines de Lucro</option>
+                                                            </select>
+                                                            <input style={inputStyle} name="factura_correo" type="email" placeholder="Correo para factura *" required value={formData.factura_correo} onChange={handleChange} />
+                                                        </>
+                                                    )}
                                                     <textarea style={{ ...inputStyle, resize: 'vertical' }} name="mensaje" placeholder="¿Alguna pregunta o comentario?" rows={3} value={formData.mensaje} onChange={handleChange} />
                                                     {formStatus === 'error' && (
                                                         <p style={{ color: '#f87171', fontSize: '0.85rem' }}>Error al enviar. Escríbenos a ventas@nexiasoluciones.com.mx</p>

@@ -24,7 +24,15 @@
       "Bash(git -C ~/dev/nexia-tools add Workflow.md)",
       "Bash(git -C ~/dev/nexia-tools commit -m \"docs: agregar protocolo de gestión de contexto /compact y /clear\")",
       "Bash(git -C ~/dev/nexia-tools push)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "mcp__supabase-nexia__list_table_columns",
+      "mcp__n8n-mcp__n8n_list_workflows",
+      "mcp__n8n-mcp__n8n_get_workflow",
+      "mcp__supabase-nexia__execute_sql",
+      "mcp__n8n-mcp__n8n_update_partial_workflow",
+      "mcp__n8n-mcp__n8n_update_full_workflow",
+      "mcp__supabase-nexia__list_constraints",
+      "mcp__n8n-mcp__n8n_executions"
     ]
   }
 }

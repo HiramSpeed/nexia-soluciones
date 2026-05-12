@@ -1,6 +1,6 @@
 # AGENTS.md — nexia-soluciones Landing Page
 > Estado del proyecto. Actualizar al cerrar cada tarea.
-> Última actualización: 2026-05-07
+> Última actualización: 2026-05-11
 
 ## Estado actual
 Landing page single-page con scroll continuo. Rutas dedicadas por app operativas (/planner, /facturacion, /tienda). Deploy via Hostinger GIT sincronizado con main. dist/ incluido en git (no en .gitignore) — requerido por el proceso de deploy de Hostinger.
@@ -69,6 +69,49 @@ Landing page single-page con scroll continuo. Rutas dedicadas por app operativas
 - [x] Imágenes agregadas a cards PDCA, VSM, SMED, Heijunka, Facturación
 - [x] npm run build sin errores — build limpio en 6.25s
 - [ ] Imagen para card Nexia Tienda (app-nexia-tienda.jpeg)
+
+## Regla — Slug de apps en nexia_billing ⚠️
+
+El campo `appSlug` que se envía al webhook nexia-ventas y se guarda en
+`nexia_billing.nexia_subscriptions.app_slug` SIEMPRE es el slug CORTO del
+proyecto real del ecosistema, NUNCA el alias visual de la landing page.
+
+**Mapeo activo** (definido en `handleSubmit` de ProductsPage.jsx y AppLanding.jsx):
+```js
+const slugMap = {
+  'nexia-planner':     'scholar',      // NexIA Planner → app nexia-scholar
+  'nexia-facturacion': 'facturacion',  // Nexia Gastos  → app nexia-facturacion
+  'nexia-tienda':      'tienda',       // Nexia Tienda  → app nexia-tienda
+};
+```
+
+**Al agregar una nueva app con ctaActive:true:**
+1. Agregar entrada al `slugMap` en ProductsPage.jsx → handleSubmit
+2. Si tiene ruta dedicada: agregar entrada al `slugMap` en AppLanding.jsx → handleSubmit
+3. Actualizar este mapeo en AGENTS.md
+
+## Arquitectura nexia-ventas (n8n) — 2026-05-11 ✅
+
+Workflow `BNlgyXvb1qzwtWUU` — 7 nodos activos:
+
+```
+Webhook → Formatear Datos → Preparar UPSERT billing → UPSERT nexia_billing
+        → Email Interno → Email al Usuario → Responder 200
+```
+
+- **Preparar UPSERT billing**: Code node — construye payload dinámico desde body del webhook
+- **UPSERT nexia_billing**: HTTP POST a Supabase con `status: 'prospecto'` y datos de factura si aplica
+- El UPSERT ocurre ANTES de los emails — si falla, bloquea el flujo y es detectable
+- Email Interno y Email al Usuario referencian "Formatear Datos" por nombre (`$node["Formatear Datos"]`)
+
+## Cambios 2026-05-11 ✅
+
+- [x] BD: 10 columnas nuevas en nexia_billing.nexia_subscriptions (telefono, factura_*)
+- [x] ProductsPage.jsx: formulario con checkbox factura + campos condicionales + slugMap en handleSubmit
+- [x] AppLanding.jsx: idéntico al anterior
+- [x] nexia-ventas: sección de facturación en correos (interno siempre visible, usuario condicional con aviso 24h)
+- [x] nexia-activate: nodo "Preparar payload" — UPSERT dinámico con campos de facturación y teléfono
+- [x] nexia-ventas: UPSERT prospecto en nexia_billing antes de emails (2 nodos nuevos)
 
 ## Restricciones activas
 - NUNCA modificar copy/textos — están aprobados y liberados
