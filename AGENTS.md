@@ -1,6 +1,6 @@
 # AGENTS.md — nexia-soluciones Landing Page
 > Estado del proyecto. Actualizar al cerrar cada tarea.
-> Última actualización: 2026-05-11
+> Última actualización: 2026-05-12
 
 ## Estado actual
 Landing page single-page con scroll continuo. Rutas dedicadas por app operativas (/planner, /facturacion, /tienda). Deploy via Hostinger GIT sincronizado con main. dist/ incluido en git (no en .gitignore) — requerido por el proceso de deploy de Hostinger.
@@ -107,11 +107,30 @@ Webhook → Formatear Datos → Preparar UPSERT billing → UPSERT nexia_billing
 ## Cambios 2026-05-11 ✅
 
 - [x] BD: 10 columnas nuevas en nexia_billing.nexia_subscriptions (telefono, factura_*)
+- [x] BD: columna `factura_enviada boolean DEFAULT false` agregada a nexia_subscriptions
+- [x] BD: columna `factura_fecha_envio timestamptz` agregada a nexia_subscriptions
 - [x] ProductsPage.jsx: formulario con checkbox factura + campos condicionales + slugMap en handleSubmit
 - [x] AppLanding.jsx: idéntico al anterior
 - [x] nexia-ventas: sección de facturación en correos (interno siempre visible, usuario condicional con aviso 24h)
 - [x] nexia-activate: nodo "Preparar payload" — UPSERT dinámico con campos de facturación y teléfono
 - [x] nexia-ventas: UPSERT prospecto en nexia_billing antes de emails (2 nodos nuevos)
+- [x] nexia-ventas + nexia-activate: fix UPSERT — URL con `?on_conflict=user_email,app_slug` (evita 409 en segundo intento)
+
+## Workflow nexia-facturacion-recordatorio ✅
+- ID: mTY8OCvvXGq4YhYy
+- Schedule: 8:00 AM y 4:00 PM hora México (America/Mexico_City)
+- Consulta: nexia_billing.nexia_subscriptions WHERE requiere_factura=true AND factura_enviada=false
+- Clasifica: Vencidas (>24h), Por vencer (20-24h), Recientes (<20h)
+- Envía correo solo si hay urgentes a ventas@ con BCC a daniel.navarro@ y juan.garces@
+- Para activar: n8n UI → toggle ON
+
+## Marcar factura como enviada
+Ejecutar SQL en Supabase cuando se emita la factura:
+```sql
+UPDATE nexia_billing.nexia_subscriptions
+SET factura_enviada = true, factura_fecha_envio = now()
+WHERE user_email = 'email@cliente.com' AND app_slug = 'scholar';
+```
 
 ## Restricciones activas
 - NUNCA modificar copy/textos — están aprobados y liberados
